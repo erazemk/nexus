@@ -1,3 +1,7 @@
 *.wpc
 *.lpr
 *.xpr
+
+# Project directories
+Nexus.cache/
+Nexus.ip_user_files/

@@ -28,7 +28,7 @@ begin
 
 	end process;
 
-	process(clock)
+	process(clock, enable)
 	begin
 		-- Write to LED
 		if rising_edge(clock) and enable = '1' then

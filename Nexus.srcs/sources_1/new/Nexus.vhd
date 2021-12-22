@@ -40,8 +40,8 @@ architecture Behavioral of Nexus is
 			data	: in std_logic_vector (7 downto 0); -- Character read from the buffer
 			enable	: out std_logic; -- Signals that a new character should be sent to data
 			led		: out std_logic_vector (15 downto 0); -- LEDs
-			an		: out std_logic_vector (7 downto 0); -- 7-seg anode
-			ca		: out std_logic_vector (7 downto 0); -- 7-seg cathode
+			anode	: out std_logic_vector (7 downto 0); -- 7-seg anode
+			cathode	: out std_logic_vector (7 downto 0); -- 7-seg cathode
 			cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
 			cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
 		);
@@ -151,8 +151,8 @@ begin
 		enable => SIG_EXECUTOR_ENABLE,
 		data => SIG_EXECUTOR_CHAR,
 		led => LED,
-		an => AN,
-		ca => CA,
+		anode => AN,
+		cathode => CA,
 		cled0 => CLED0,
 		cled1 => CLED1
 	);

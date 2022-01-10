@@ -38,7 +38,7 @@ architecture Behavioral of Nexus is
 			reset	: in std_logic;
 			enter	: in std_logic; -- Signals that a new line has been written
 			data	: in std_logic_vector (7 downto 0); -- Character read from the buffer
-			enable	: out std_logic; -- Signals that a new character should be sent to data
+			enable	: inout std_logic; -- Signals that a new character should be sent to data
 			led		: out std_logic_vector (15 downto 0); -- LEDs
 			anode	: out std_logic_vector (7 downto 0); -- 7-seg anode
 			cathode	: out std_logic_vector (7 downto 0); -- 7-seg cathode
@@ -140,6 +140,7 @@ begin
 		if rising_edge(CLOCK) and SIG_EXECUTOR_ENABLE = '1' then
 			SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
 			SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+			SIG_EXECUTOR_ENABLE <= '0';
 		end if;
 	end process;
 

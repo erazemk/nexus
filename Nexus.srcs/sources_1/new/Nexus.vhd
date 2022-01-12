@@ -111,7 +111,7 @@ begin
 	end process;
 
 	-- Send character to VGA module and increment counter
-	vga_proc: process(CLOCK)
+	vga_proc: process(CLOCK, SIG_VGA_NEWCHAR)
 	begin
 		if (rising_edge(CLOCK) and SIG_VGA_NEWCHAR = '1') then
 			SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
@@ -120,7 +120,7 @@ begin
 	end process;
 	
 	-- Read character from keyboard module and increment counter
-	keyboard_proc: process(CLOCK)
+	keyboard_proc: process(CLOCK,SIG_KEYBOARD_EOT)
 	begin
 		if rising_edge(CLOCK) and SIG_KEYBOARD_EOT = '1' then
 			CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
@@ -135,7 +135,7 @@ begin
 	end process;
 	
 	-- Send character to executor module and increment counter
-	executor_proc: process(CLOCK)
+	executor_proc: process(CLOCK, SIG_EXECUTOR_ENABLE)
 	begin
 		if rising_edge(CLOCK) and SIG_EXECUTOR_ENABLE = '1' then
 			SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));

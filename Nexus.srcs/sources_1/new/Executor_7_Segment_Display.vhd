@@ -62,7 +62,7 @@ architecture Behavioral of Executor_7_Segment_Display is
 
 begin
 
-	process(id)
+	process(id, sig_anode_id)
 	begin
 		-- Select which display to use
 		if id = '0' then

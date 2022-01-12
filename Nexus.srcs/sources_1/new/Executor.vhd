@@ -39,7 +39,7 @@ architecture Behavioral of Executor is
 			enable	: in std_logic; -- Signals when to write to an LED
 			state	: in std_logic; -- Whether LED should be on (1) or off (0)
 			id		: in std_logic; -- ID of LED to write to
-			color	: in std_logic_vector (2 downto 0); -- Color for the LED, either 0 - White, 1 - Red, 2 - Green or 3 - Blue
+			color	: in std_logic_vector (1 downto 0); -- Color for the LED, either 0 - White, 1 - Red, 2 - Green or 3 - Blue
 			cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
 			cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
 		);
@@ -65,7 +65,7 @@ architecture Behavioral of Executor is
 			symbol	: in std_logic_vector(7 downto 0);
 			enable	: in std_logic;
 			parsed	: out std_logic;
-			command	: out std_logic_vector(1 downto 0);
+			command	: inout std_logic_vector(1 downto 0);
 			id		: out std_logic_vector(3 downto 0);
 			onoff	: out std_logic;
 			value	: out std_logic_vector(15 downto 0);
@@ -89,7 +89,7 @@ architecture Behavioral of Executor is
 	-- RGB LED signals
 	signal sig_rgb_enable	: std_logic;
 	signal sig_rgb_id		: std_logic;
-	signal sig_rgb_color	: std_logic_vector (2 downto 0);
+	signal sig_rgb_color	: std_logic_vector (1 downto 0);
 
 	-- 7-segment display signals
 	signal sig_seg_enable	: std_logic;
@@ -104,27 +104,32 @@ begin
 	sig_rgb_id <= sig_id(0);
 	sig_seg_id <= sig_id(0);
 
-	sig_rgb_color <= sig_value(7 downto 0);
+	sig_rgb_color <= sig_value(1 downto 0);
 	sig_seg_value <= sig_value;
 
-	process()
+	GET_CHAR : process(clock)
 	begin
+		if rising_edge(clock) then
+			if sig_newchar = '1' then
+				enable <= '1';
+			end if;
 
-		if rising_edge(clock) && sig_newchar = '1' then
-			enable <= '1';
-		end if;
-
-		if enter = '1' then
-			sig_parser_en <= '1';
-		end if;
-		
-		if sig_parser_en = '1' then
-			case sig_command is
-				-- TODO: Poglej kdaj moraš resetirat enable
-				when "00" => sig_led_enable <= 1;
-				when "01" => sig_rgb_enable <= 1;
-				when "10" => sig_seg_enable <= 1;
-			end case;
+			if enter = '1' then
+				sig_parser_en <= '1';
+			end if;
+			
+			if sig_parser_en = '1' then
+				case sig_command is
+					-- TODO: Poglej kdaj moraš resetirat enable
+					when "00" => sig_led_enable <= '1';
+					when "01" => sig_rgb_enable <= '1';
+					when "10" => sig_seg_enable <= '1';
+					when others => 
+					   sig_led_id <= "1111";
+					   sig_state <= '1';
+					   sig_led_enable <= '1';
+				end case;
+			end if;
 		end if;
 
 	end process;

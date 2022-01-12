@@ -10,7 +10,7 @@ entity Executor_RGB_LEDs is
 		enable	: in std_logic; -- Signals when to write to an LED
 		state	: in std_logic; -- Whether LED should be on (1) or off (0)
 		id		: in std_logic; -- ID of LED to write to
-		color	: in std_logic_vector (2 downto 0); -- Color for the LED, either 0 - White, 1 - Red, 2 - Green or 3 - Blue
+		color	: in std_logic_vector (1 downto 0); -- Color for the LED, either 0 - White, 1 - Red, 2 - Green or 3 - Blue
 		cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
 		cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
 	);

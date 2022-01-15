@@ -7,9 +7,9 @@ entity Executor is
 	Port (
 		clock	: in std_logic;
 		reset	: in std_logic;
-		enter	: in std_logic;
+		enter	: inout std_logic;
 		data	: in std_logic_vector (7 downto 0);
-		enable	: out std_logic;
+		enable	: inout std_logic;
 		led		: out std_logic_vector (15 downto 0);
 		anode	: out std_logic_vector (7 downto 0);
 		cathode	: out std_logic_vector (7 downto 0);
@@ -64,12 +64,12 @@ architecture Behavioral of Executor is
 			reset	: in std_logic;
 			symbol	: in std_logic_vector(7 downto 0);
 			enable	: in std_logic;
-			parsed	: out std_logic;
+			parsed	: inout std_logic;
 			command	: inout std_logic_vector(1 downto 0);
 			id		: out std_logic_vector(3 downto 0);
 			onoff	: out std_logic;
 			value	: out std_logic_vector(15 downto 0);
-			newchar	: out std_logic
+			newchar	: inout std_logic
 		);
 	end component;
 	
@@ -80,7 +80,7 @@ architecture Behavioral of Executor is
 	signal sig_command		: std_logic_vector(1 downto 0);
 	signal sig_id			: std_logic_vector(3 downto 0);
 	signal sig_value		: std_logic_vector(15 downto 0);
-	signal sig_newchar		: std_logic;
+	--signal sig_newchar		: std_logic;
 	
 	-- LED signals
 	signal sig_led_enable	: std_logic;
@@ -110,12 +110,17 @@ begin
 	GET_CHAR : process(clock)
 	begin
 		if rising_edge(clock) then
-			if sig_newchar = '1' then
-				enable <= '1';
-			end if;
+			--if sig_newchar = '1' then
+			--	enable <= '1';
+			--end if;
 
 			if enter = '1' then
 				sig_parser_en <= '1';
+			end if;
+
+			if sig_parsed = '1' then
+				enter <= '0';
+				sig_parsed <= '0';
 			end if;
 			
 			if sig_parser_en = '1' then
@@ -151,7 +156,9 @@ begin
 		enable => sig_rgb_enable,
 		state => sig_state,
 		id => sig_rgb_id,
-		color => sig_rgb_color
+		color => sig_rgb_color,
+		cled0 => cled0,
+		cled1 => cled1
 	);
 	
 	module_seven_segment_display: Executor_7_Segment_Display
@@ -172,12 +179,12 @@ begin
 		reset => reset,
 		symbol => data,
 		enable => sig_parser_en,
-		parsed => sig_parsed, 
+		parsed => sig_parsed,
 		command => sig_command,
 		id => sig_id,
 		onoff => sig_state,
 		value => sig_value,
-		newchar => sig_newchar
+		newchar => enable --sig_newchar
 	);
 
 end Behavioral;

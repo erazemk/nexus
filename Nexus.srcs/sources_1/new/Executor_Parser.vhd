@@ -7,12 +7,12 @@ entity Executor_Parser is
 		reset	: in std_logic;
 		symbol	: in std_logic_vector(7 downto 0);
 		enable	: in std_logic;
-		parsed	: out std_logic;
+		parsed	: inout std_logic;
 		command	: inout std_logic_vector(1 downto 0);
 		id		: out std_logic_vector(3 downto 0);
 		onoff	: out std_logic;
 		value	: out std_logic_vector(15 downto 0);
-		newchar : out std_logic
+		newchar : inout std_logic
 	);
 end Executor_Parser;
 
@@ -49,45 +49,48 @@ begin
 		end if;
 	end process;
 
-	NEXT_STATE_DECODE : process (state, next_space, enable, skip, clock)
+	NEXT_STATE_DECODE : process (state, next_space, enable, skip, clock, newchar)
 	begin
-		next_state <= state;
-		case state is
-			when S_IDLE =>
-				if enable = '1' then
-					next_state <= S_COMMAND;
-				end if;
-			when S_COMMAND =>
-				if next_space = '1' then
-					next_state <= S_ID;	
-					skip <= '0';	
-				elsif skip = '1' then
-					next_state <= S_SKIP;
-				end if; 
-			when S_ID =>
-				if next_space = '1' then
-					next_state <= S_ONOFF;
-				end if;
-			when S_ONOFF =>
-				if next_space = '1' then
-					next_state <= S_VALUE1;
-				end if;
-			when S_SKIP =>
-				if next_space = '1' then
-					next_state <= S_ID;
-					skip <= '0';
-				end if;
-			when S_VALUE1 =>
-					next_state <= S_VALUE2;
-			when S_VALUE2 =>
-					next_state <= S_VALUE3;
-			when S_VALUE3 =>
-					next_state <= S_VALUE4;
-			when S_VALUE4 =>
-					next_state <= S_IDLE;					
-			when others =>
-				next_state <= S_IDLE;
-		end case;
+	    if rising_edge(clock) and newchar = '0' then
+            next_state <= state;
+            case state is
+                when S_IDLE =>
+                    if enable = '1' then
+                        next_state <= S_COMMAND;
+                    end if;
+                when S_COMMAND =>
+                    if next_space = '1' then
+                        next_state <= S_ID;	
+                        skip <= '0';	
+                    elsif skip = '1' then
+                        next_state <= S_SKIP;
+                    end if; 
+                when S_ID =>
+                    if next_space = '1' then
+                        next_state <= S_ONOFF;
+                    end if;
+                when S_ONOFF =>
+                    if next_space = '1' then
+                        next_state <= S_VALUE1;
+                    end if;
+                when S_SKIP =>
+                    if next_space = '1' then
+                        next_state <= S_ID;
+                        skip <= '0';
+                    end if;
+                when S_VALUE1 =>
+                        next_state <= S_VALUE2;
+                when S_VALUE2 =>
+                        next_state <= S_VALUE3;
+                when S_VALUE3 =>
+                        next_state <= S_VALUE4;
+                when S_VALUE4 =>
+                        next_state <= S_IDLE;					
+                when others =>
+                    next_state <= S_IDLE;
+              end case;
+              newchar <= '1';
+		 end if;
 	end process;
 
 	OUTPUT_DECODE : process (state, symbol, first_o, command)

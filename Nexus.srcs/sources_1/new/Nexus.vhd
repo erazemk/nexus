@@ -36,7 +36,7 @@ architecture Behavioral of Nexus is
 		Port (
 			clock	: in std_logic;
 			reset	: in std_logic;
-			enter	: in std_logic; -- Signals that a new line has been written
+			enter	: inout std_logic; -- Signals that a new line has been written
 			data	: in std_logic_vector (7 downto 0); -- Character read from the buffer
 			enable	: inout std_logic; -- Signals that a new character should be sent to data
 			led		: out std_logic_vector (15 downto 0); -- LEDs
@@ -66,9 +66,9 @@ architecture Behavioral of Nexus is
 			reset	: in std_logic;
 			kclk	: in std_logic;
 			kdata	: in std_logic;
-			data	: out std_logic_vector (8 downto 0); -- Character from keyboard
-			eot		: out std_logic; -- Signals that a new character was written
-			enter	: out std_logic -- Signals that a new line was written
+			data	: out std_logic_vector (7 downto 0); -- Character from keyboard
+			eot		: out std_logic -- Signals that a new character was written
+			--enter	: out std_logic -- Signals that a new line was written
 		);
 	end component;
 	
@@ -125,6 +125,9 @@ begin
 		if rising_edge(CLOCK) and SIG_KEYBOARD_EOT = '1' then
 			CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
 			SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+			if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
+				SIG_KEYBOARD_ENTER <= '1';
+			end if;
 			
 			-- TODO: Shift buffer when it's full
 			-- if SIG_KEYBOARD_COUNTER = 2130 then
@@ -177,8 +180,8 @@ begin
 		kclk => KCLK,
 		kdata => KDATA,
 		data => SIG_KEYBOARD_CHAR,
-		eot => SIG_KEYBOARD_EOT,
-		enter => SIG_KEYBOARD_ENTER
+		eot => SIG_KEYBOARD_EOT
+		--enter => SIG_KEYBOARD_ENTER
 	);
 
 end Behavioral;

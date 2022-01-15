@@ -9,9 +9,9 @@ entity Keyboard is
 		reset	: in std_logic;
 		kclk	: in  std_logic;
 		kdata	: in  std_logic;
-		data	: out std_logic_vector (8 downto 0);
-		eot		: out std_logic;
-		enter	: out std_logic
+		data	: out std_logic_vector (7 downto 0);
+		eot		: out std_logic
+		--enter	: out std_logic
 	);
 
 end Keyboard;
@@ -47,7 +47,7 @@ architecture Behavioral of Keyboard is
 begin
 
     -- Prirejanje vhoda/izhoda
-    data <= SIPO;
+    data <= SIPO(7 downto 0);
 
     -- Instanciranje 
     pulseGen_inst : Keyboard_Pulse_Generator

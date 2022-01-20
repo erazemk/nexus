@@ -23,19 +23,13 @@ architecture Behavioral of Prescaler is
 	signal count : unsigned(width - 1 downto 0) := (others => '0');
 
 begin
-
-	process(reset)
-	begin
 	
+	process(clock, reset)
+	begin
 		if reset = '1' then
 			count <= (others => '0');
 			enable <= '0';
 		end if;
-	
-	end process;
-	
-	process(clock)
-	begin
 
 		if rising_edge(clock) then
 			if count >= max_value - 1 then

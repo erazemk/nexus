@@ -23,18 +23,12 @@ architecture Behavioral of Executor_RGB_LEDs is
 
 begin
 
-	process(reset)
+	process(clock, enable, reset)
 	begin
-
 		if reset = '1' then
 			cled0 <= (others => '0');
 			cled1 <= (others => '0');
 		end if;
-
-	end process;
-
-	process(clock, enable)
-	begin
 		-- Write to LED
 		if rising_edge(clock) and enable = '1' then
 			-- Select which LED to address

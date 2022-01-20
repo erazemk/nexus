@@ -20,18 +20,13 @@ architecture Behavioral of Anode_Switcher is
 
 begin
 
-	process(reset)
+	process(reset, clock, enable, state)
 	begin
-		
+
 		if reset = '1' then
 			anode <= "1111";
 			count <= (others => '0');
 		end if;
-		
-	end process;
-
-	process(clock, enable, state)
-	begin
 
 		if rising_edge(clock) and enable = '1' then
 			if state = '1' then

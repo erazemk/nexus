@@ -62,6 +62,8 @@ architecture Behavioral of Executor_7_Segment_Display is
 
 begin
 
+	sig_enable <= enable;
+
 	process(id, sig_anode_id)
 	begin
 		-- Select which display to use

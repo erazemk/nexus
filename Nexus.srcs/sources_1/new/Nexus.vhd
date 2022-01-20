@@ -53,6 +53,7 @@ architecture Behavioral of Nexus is
 			reset	: in std_logic;
 			hsync	: out std_logic;
 			vsync	: out std_logic;
+			char	: in std_logic_vector (7 downto 0);
 			newchar	: out std_logic; -- Requests a new character from the buffer
 			red		: out std_logic_vector (3 downto 0);
 			green	: out std_logic_vector (3 downto 0);
@@ -98,52 +99,48 @@ architecture Behavioral of Nexus is
 begin
 
 	SIG_RESET <= not RESET;
-	
-	-- Reset all counters and clear buffer
-	reset_proc: process(SIG_RESET)
+
+	ram_proc: process(CLOCK, SIG_VGA_NEWCHAR, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE, SIG_RESET)
 	begin
+
 		if SIG_RESET = '1' then
 			SIG_VGA_COUNTER <= (others => '0');
 			SIG_KEYBOARD_COUNTER <= (others => '0');
 			SIG_EXECUTOR_COUNTER <= (others => '0');
-			CODE_BUFFER <= (others => (others => '0'));
+			CODE_BUFFER <= (others => (others => '0')); -- TODO: Fix resetting buffer
 		end if;
-	end process;
 
-	-- Send character to VGA module and increment counter
-	vga_proc: process(CLOCK, SIG_VGA_NEWCHAR)
-	begin
-		if (rising_edge(CLOCK) and SIG_VGA_NEWCHAR = '1') then
-			SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
-			SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
-		end if;
-	end process;
-	
-	-- Read character from keyboard module and increment counter
-	keyboard_proc: process(CLOCK,SIG_KEYBOARD_EOT)
-	begin
-		if rising_edge(CLOCK) and SIG_KEYBOARD_EOT = '1' then
-			CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
-			SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-			if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
-				SIG_KEYBOARD_ENTER <= '1';
+		if rising_edge(CLOCK) then
+
+			-- Send character to VGA module and increment counter
+			if SIG_VGA_NEWCHAR = '1' then
+				SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
+				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
 			end if;
-			
-			-- TODO: Shift buffer when it's full
-			-- if SIG_KEYBOARD_COUNTER = 2130 then
-			--		CODE_BUFFER(0 to 2130) <= CODE_BUFFER(71 to 2130);
-			-- end if;
-			
-		end if;
-	end process;
-	
-	-- Send character to executor module and increment counter
-	executor_proc: process(CLOCK, SIG_EXECUTOR_ENABLE)
-	begin
-		if rising_edge(CLOCK) and SIG_EXECUTOR_ENABLE = '1' then
-			SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
-			SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-			SIG_EXECUTOR_ENABLE <= '0';
+
+			-- Read character from keyboard module and increment counter
+			if SIG_KEYBOARD_EOT = '1' then
+				CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
+				SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+
+				if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
+					SIG_KEYBOARD_ENTER <= '1';
+				end if;
+				
+				-- TODO: Shift buffer when it's full
+				-- if SIG_KEYBOARD_COUNTER = 2130 then
+				--		CODE_BUFFER(0 to 2130) <= CODE_BUFFER(71 to 2130);
+				-- end if;
+				
+			end if;
+
+			-- Send character to executor module and increment counter
+			if SIG_EXECUTOR_ENABLE = '1' then
+				SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
+				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+				SIG_EXECUTOR_ENABLE <= '0';
+			end if;
+
 		end if;
 	end process;
 
@@ -165,6 +162,7 @@ begin
 	port map (
 		clock => CLOCK,
 		reset => SIG_RESET,
+		char => SIG_VGA_CHAR,
 		hsync => VGA_HS,
 		vsync => VGA_VS,
 		newchar => SIG_VGA_NEWCHAR,

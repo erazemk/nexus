@@ -19,17 +19,13 @@ architecture Behavioral of Executor_LEDs is
 
 begin
 
-	process(reset)
+	process(reset, clock, enable)
 	begin
 
 		if reset = '1' then
 			led <= (others => '1');
 		end if;
 
-	end process;
-
-	process(clock, enable)
-	begin
 		-- Write to LED
 		if rising_edge(clock) and enable = '1' then
 			-- 'not state' because LED == off when state == 1

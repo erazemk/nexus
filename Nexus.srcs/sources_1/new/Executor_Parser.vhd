@@ -9,7 +9,9 @@ entity Executor_Parser is
 		enable	: in std_logic;
 		parsed	: inout std_logic;
 		command	: inout std_logic_vector(1 downto 0);
-		id		: out std_logic_vector(3 downto 0);
+		led_id	: out std_logic_vector(3 downto 0);
+		cled_id	: out std_logic;
+		seg_id	: out std_logic;
 		onoff	: out std_logic;
 		value	: out std_logic_vector(15 downto 0);
 		newchar : inout std_logic
@@ -19,7 +21,7 @@ end Executor_Parser;
 architecture Behavioral of Executor_Parser is
 
 	type states is (S_IDLE, S_SKIP, S_COMMAND, S_ID, S_ONOFF, S_VALUE1, S_VALUE2, S_VALUE3, S_VALUE4);
-	signal state, next_state	: states;
+	signal state, next_state			: states;
 	signal next_space, first_o, skip	: std_logic;
 
 begin
@@ -113,28 +115,51 @@ begin
 					end if;
 				
 				when S_ID =>
-					case symbol is 
-						when "01000101" => id <= "0000"; -- 0 
-						when "00010110" => id <= "0001"; -- 1
-						when "00011110" => id <= "0010"; -- 2
-						when "00100110" => id <= "0011"; -- 3
-						when "00100101" => id <= "0100"; -- 4
-						when "00101110" => id <= "0101"; -- 5
-						when "00110110" => id <= "0110"; -- 6
-						when "00111101" => id <= "0111"; -- 7
-						when "00111110" => id <= "1000"; -- 8
-						when "01000110" => id <= "1001"; -- 9
-						when "00011100" => id <= "1010"; -- A
-						when "00110010" => id <= "1011"; -- B
-						when "00100001" => id <= "1100"; -- C
-						when "00100011" => id <= "1101"; -- D
-						when "00100100" => id <= "1110"; -- E
-						when "00101011"	=> id <= "1111"; -- F
-						when others =>
-							id <= "1111";
-							onoff <= '1';
-							command <= "00";
-					end case; 
+					if command = "00" then
+						case symbol is 
+							when "01000101" => led_id <= "0000"; -- 0
+							when "00010110" => led_id <= "0001"; -- 1
+							when "00011110" => led_id <= "0010"; -- 2
+							when "00100110" => led_id <= "0011"; -- 3
+							when "00100101" => led_id <= "0100"; -- 4
+							when "00101110" => led_id <= "0101"; -- 5
+							when "00110110" => led_id <= "0110"; -- 6
+							when "00111101" => led_id <= "0111"; -- 7
+							when "00111110" => led_id <= "1000"; -- 8
+							when "01000110" => led_id <= "1001"; -- 9
+							when "00011100" => led_id <= "1010"; -- A
+							when "00110010" => led_id <= "1011"; -- B
+							when "00100001" => led_id <= "1100"; -- C
+							when "00100011" => led_id <= "1101"; -- D
+							when "00100100" => led_id <= "1110"; -- E
+							when "00101011"	=> led_id <= "1111"; -- F
+							when others =>
+								id <= "1111";
+								onoff <= '1';
+						end case; 
+					elsif command = "01" then
+						case symbol is 
+							when "01000101" => cled_id <= "0000"; -- 0
+							when "00010110" => cled_id <= "0001"; -- 1
+							when others =>
+								id <= "1111";
+								onoff <= '1';
+								command <= "00";
+						end case; 					
+					elsif command = "10" then
+						case symbol is 
+							when "01000101" => seg_id <= "0000"; -- 0
+							when "00010110" => seg_id <= "0001"; -- 1
+							when others =>
+								id <= "1111";
+								onoff <= '1';
+								command <= "00";
+						end case; 
+					else
+						id <= "1111";
+						onoff <= '1';
+						command <= "00";
+					end if;
 					
 				when S_ONOFF =>
 					if symbol = "01000100" or first_o = '1' then --symbol = O 

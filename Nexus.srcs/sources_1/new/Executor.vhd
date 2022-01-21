@@ -66,7 +66,9 @@ architecture Behavioral of Executor is
 			enable	: in std_logic;
 			parsed	: inout std_logic;
 			command	: inout std_logic_vector(1 downto 0);
-			id		: out std_logic_vector(3 downto 0);
+			led_id	: out std_logic_vector(3 downto 0);
+			cled_id	: out std_logic;
+			seg_id	: out std_logic;
 			onoff	: out std_logic;
 			value	: out std_logic_vector(15 downto 0);
 			newchar	: inout std_logic
@@ -99,10 +101,6 @@ architecture Behavioral of Executor is
 	signal sig_prev_enable	: std_logic;
 
 begin
-
-	sig_led_id <= sig_id;
-	sig_rgb_id <= sig_id(0);
-	sig_seg_id <= sig_id(0);
 
 	sig_rgb_color <= sig_value(1 downto 0);
 	sig_seg_value <= sig_value;
@@ -181,7 +179,9 @@ begin
 		enable => sig_parser_en,
 		parsed => sig_parsed,
 		command => sig_command,
-		id => sig_id,
+		led_id => sig_led_id,
+		cled_id => sig_cled_id,
+		seg_id => sig_seg_id,
 		onoff => sig_state,
 		value => sig_value,
 		newchar => enable --sig_newchar

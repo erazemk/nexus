@@ -50,9 +50,10 @@ architecture Behavioral of Executor is
 			clock	: in std_logic;
 			reset	: in std_logic;
 			enable	: in std_logic; -- Signals when to write to a display
-			state	: in std_logic; -- Whether display should be on (1) or off (0)
-			id		: in std_logic; -- Display to write to
-			value	: in std_logic_vector (15 downto 0); -- Value to write to display
+			state1	: in std_logic; -- Whether display should be on (1) or off (0)
+			state2	: in std_logic; -- Whether display should be on (1) or off (0)
+			-- id		: in std_logic; -- Display to write to
+			value	: in std_logic_vector (31 downto 0); -- Value to write to display
 			cathode	: out std_logic_vector (7 downto 0);
 			anode	: out std_logic_vector (7 downto 0)
 		);
@@ -78,7 +79,7 @@ architecture Behavioral of Executor is
 	-- Shared signals
 	signal sig_state		: std_logic;
 	signal sig_parsed		: std_logic; -- Enabled when parser has parsed line
-	signal sig_parser_en	: std_logic; -- Signals to the parser to start parsing
+	--signal sig_parser_en	: std_logic; -- Signals to the parser to start parsing
 	signal sig_command		: std_logic_vector(1 downto 0);
 	signal sig_id			: std_logic_vector(3 downto 0);
 	signal sig_value		: std_logic_vector(15 downto 0);
@@ -95,15 +96,16 @@ architecture Behavioral of Executor is
 
 	-- 7-segment display signals
 	signal sig_seg_enable	: std_logic;
+	signal sig_seg1_state	: std_logic;
+	signal sig_seg2_state	: std_logic;
 	signal sig_seg_id		: std_logic; -- Display id, either 1 (left display) or 0 (right display)
-	signal sig_seg_value	: std_logic_vector (15 downto 0); -- Binary value for one of the displays
+	signal sig_seg_value	: std_logic_vector (31 downto 0); -- Binary value for one of the displays
 
 	signal sig_prev_enable	: std_logic;
 
 begin
 
 	sig_rgb_color <= sig_value(1 downto 0);
-	sig_seg_value <= sig_value;
 
 	GET_CHAR : process(clock)
 	begin
@@ -112,25 +114,31 @@ begin
 			--	enable <= '1';
 			--end if;
 
-			if enter = '1' then
-				sig_parser_en <= '1';
-			end if;
+			-- if enter = '1' then
+			-- 	sig_parser_en <= '1';
+			-- end if;
 
 			if sig_parsed = '1' then
 				enter <= '0';
 				sig_parsed <= '0';
 			end if;
 			
-			if sig_parser_en = '1' then
+			if enter = '1' then
 				case sig_command is
 					-- TODO: Poglej kdaj moraš resetirat enable
 					when "00" => sig_led_enable <= '1';
 					when "01" => sig_rgb_enable <= '1';
-					when "10" => sig_seg_enable <= '1';
-					when others => 
-					   sig_led_id <= "1111";
-					   sig_state <= '1';
-					   sig_led_enable <= '1';
+					when "10" =>
+						if sig_seg_id = '0' then
+							sig_seg1_state <= sig_state;
+							sig_seg_value(15 downto 0) <= sig_value;
+						else
+							sig_seg2_state <= sig_state;
+							sig_seg_value(31 downto 16) <= sig_value;
+						end if;
+
+						sig_seg_enable <= '1';
+					when others => sig_led_enable <= '1';
 				end case;
 			end if;
 		end if;
@@ -164,8 +172,8 @@ begin
 		clock => clock,
 		reset => reset,
 		enable => sig_seg_enable,
-		state => sig_state,
-		id => sig_seg_id,
+		state1 => sig_seg1_state,
+		state2 => sig_seg2_state,
 		value => sig_seg_value,
 		cathode => cathode,
 		anode => anode
@@ -176,11 +184,11 @@ begin
 		clock => clock,
 		reset => reset,
 		symbol => data,
-		enable => sig_parser_en,
+		enable => enter,
 		parsed => sig_parsed,
 		command => sig_command,
 		led_id => sig_led_id,
-		cled_id => sig_cled_id,
+		cled_id => sig_rgb_id,
 		seg_id => sig_seg_id,
 		onoff => sig_state,
 		value => sig_value,

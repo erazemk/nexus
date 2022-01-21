@@ -18,7 +18,7 @@ entity Nexus is
 
 		-- Executor I/O
 		LED		: out std_logic_vector (15 downto 0);
-		AN		: inout std_logic_vector (7 downto 0);
+		AN		: out std_logic_vector (7 downto 0);
 		CA		: out std_logic_vector (7 downto 0);
 		CLED0	: out std_logic_vector (2 downto 0);
 		CLED1	: out std_logic_vector (2 downto 0);
@@ -116,6 +116,7 @@ begin
 			if SIG_VGA_NEWCHAR = '1' then
 				SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
 				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
+				SIG_VGA_NEWCHAR <= '0';
 			end if;
 
 			-- Read character from keyboard module and increment counter

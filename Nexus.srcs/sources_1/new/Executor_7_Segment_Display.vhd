@@ -8,9 +8,9 @@ entity Executor_7_Segment_Display is
 		clock	: in std_logic;
 		reset	: in std_logic;
 		enable	: in std_logic; -- Signals when to write to a display
-		state	: in std_logic; -- Whether display should be on (1) or off (0)
-		id		: in std_logic; -- Display to write to
-		value	: in std_logic_vector (15 downto 0); -- Value to write to display
+		state1	: in std_logic; -- Whether display should be on (1) or off (0)
+		state2	: in std_logic;
+		value	: in std_logic_vector (31 downto 0); -- Value to write to display
 		cathode	: out std_logic_vector (7 downto 0);
 		anode	: out std_logic_vector (7 downto 0)
 	);
@@ -35,8 +35,9 @@ architecture Behavioral of Executor_7_Segment_Display is
 			clock	: in std_logic;
 			reset	: in std_logic;
 			enable	: in std_logic;
-			state	: in std_logic;
-			anode	: out std_logic_vector (3 downto 0)
+			state1	: in std_logic;
+			state2	: in std_logic;
+			anode	: out std_logic_vector (7 downto 0)
 		);
 	end component;
 	
@@ -49,31 +50,21 @@ architecture Behavioral of Executor_7_Segment_Display is
 	
 	component Value_To_Digit is
 		Port (
-			value	: in std_logic_vector (15 downto 0);
-			anode	: in std_logic_vector (3 downto 0);
+			value	: in std_logic_vector (31 downto 0);
+			anode	: in std_logic_vector (7 downto 0);
 			digit	: out std_logic_vector (3 downto 0)
 		);
 	end component;
 	
 	-- Signals
-	signal sig_anode_id	: std_logic_vector (3 downto 0);
 	signal sig_enable	: std_logic;
 	signal sig_digit	: std_logic_vector (3 downto 0);
+	signal sig_anode	: std_logic_vector (7 downto 0);
 
 begin
 
 	sig_enable <= enable;
-
-	process(id, sig_anode_id)
-	begin
-		-- Select which display to use
-		if id = '0' then
-			anode(3 downto 0) <= sig_anode_id;
-		else
-			anode(7 downto 4) <= sig_anode_id;
-		end if;
-
-	end process;
+	anode <= sig_anode;
 
 	module_prescaler: Prescaler
 	generic map (
@@ -90,20 +81,21 @@ begin
 		clock => clock,
 		reset => reset,
 		enable => sig_enable,
-		state => state,
-		anode => sig_anode_id
+		state1 => state1,
+		state2 => state2,
+		anode => sig_anode
 	);
-	
+
 	module_digit_to_segments: Digit_To_Segments
 	port map (
 		digit => sig_digit,
 		cathode => cathode
 	);
-	
+
 	module_value_to_digit: Value_To_Digit
 	port map (
 		value => value,
-		anode => sig_anode_id,
+		anode => sig_anode,
 		digit => sig_digit
 	);
 

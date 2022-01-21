@@ -134,29 +134,29 @@ begin
 							when "00100100" => led_id <= "1110"; -- E
 							when "00101011"	=> led_id <= "1111"; -- F
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 						end case; 
 					elsif command = "01" then
 						case symbol is 
-							when "01000101" => cled_id <= "0000"; -- 0
-							when "00010110" => cled_id <= "0001"; -- 1
+							when "01000101" => cled_id <= '0'; -- 0
+							when "00010110" => cled_id <= '1'; -- 1
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case; 					
 					elsif command = "10" then
 						case symbol is 
-							when "01000101" => seg_id <= "0000"; -- 0
-							when "00010110" => seg_id <= "0001"; -- 1
+							when "01000101" => seg_id <= '0'; -- 0
+							when "00010110" => seg_id <= '1'; -- 1
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case; 
 					else
-						id <= "1111";
+						led_id <= "1111";
 						onoff <= '1';
 						command <= "00";
 					end if;
@@ -208,7 +208,7 @@ begin
 							when "00100100" => value(15 downto 12) <= "1110"; -- E
 							when "00101011"	=> value(15 downto 12) <= "1111"; -- F
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case;
@@ -236,7 +236,7 @@ begin
 							when "00100100" => value(11 downto 8) <= "1110"; -- E
 							when "00101011"	=> value(11 downto 8) <= "1111"; -- F
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case;
@@ -264,7 +264,7 @@ begin
 							when "00100100" => value(7 downto 4) <= "1110"; -- E
 							when "00101011"	=> value(7 downto 4) <= "1111"; -- F
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case;
@@ -290,7 +290,7 @@ begin
 							when "00100100" => value(3 downto 0) <= "1110"; -- E
 							when "00101011"	=> value(3 downto 0) <= "1111"; -- F
 							when others =>
-								id <= "1111";
+								led_id <= "1111";
 								onoff <= '1';
 								command <= "00";
 						end case;

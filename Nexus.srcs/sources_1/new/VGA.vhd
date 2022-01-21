@@ -76,9 +76,9 @@ architecture Behavioral of VGA is
 	signal red1				: std_logic_vector (3 downto 0);
 	signal green1			: std_logic_vector (3 downto 0);
 	signal blue1			: std_logic_vector (3 downto 0);
-
 begin
 
+    
 	module_hsync: VGA_HSync_Instance
 	port map (
 		clk => clock,
@@ -124,10 +124,7 @@ begin
 		green => green1,
 		blue => blue1
 	);
-
-	-- Kdaj smo v vidnem delu zaslona po obeh oseh 
     display_both <= h_display and v_display;
-
 	-- Primer 3: vodoravni pasovi rdece, modre in zelene 
 	red <= "1111" when (display_both = '1' and row >= 0 and row < 160) else "0000";
 	green <= "1111" when (display_both = '1' and row >= 160 and row < 320) else "0000";

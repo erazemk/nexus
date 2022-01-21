@@ -14,7 +14,9 @@ entity VGA_Array is
 end VGA_Array;
 
 architecture Behavioral of VGA_Array is
-
+--Višina ene črke je 16px
+type memory is array (0 to 15) of std_logic_vector(0 to 639);
+    signal RAM : memory; --:= (others => (others => '0'))
 begin
 
 

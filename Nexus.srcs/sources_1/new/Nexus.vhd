@@ -54,7 +54,8 @@ architecture Behavioral of Nexus is
 			hsync	: out std_logic;
 			vsync	: out std_logic;
 			char	: in std_logic_vector (7 downto 0);
-			newchar	: out std_logic; -- Requests a new character from the buffer
+			chargot : in std_logic;
+			getchar	: out std_logic;
 			red		: out std_logic_vector (3 downto 0);
 			green	: out std_logic_vector (3 downto 0);
 			blue	: out std_logic_vector (3 downto 0)
@@ -84,6 +85,8 @@ architecture Behavioral of Nexus is
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
 	signal SIG_VGA_COUNTER		: unsigned (11 downto 0);
 	signal SIG_VGA_NEWCHAR		: std_logic;
+	signal SIG_VGA_PREVCHAR		: std_logic;
+	signal SIG_VGA_GOTCHAR		: std_logic;
 
 	-- Keyboard signals
 	signal SIG_KEYBOARD_CHAR	: std_logic_vector (7 downto 0);
@@ -113,10 +116,13 @@ begin
 		if rising_edge(CLOCK) then
 
 			-- Send character to VGA module and increment counter
-			if SIG_VGA_NEWCHAR = '1' then
+			if SIG_VGA_NEWCHAR = '0' then
+				SIG_VGA_PREVCHAR <= '0';
+			elsif SIG_VGA_NEWCHAR = '1' and SIG_VGA_PREVCHAR = '0' then
 				SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
 				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
-				SIG_VGA_NEWCHAR <= '0';
+				SIG_VGA_GOTCHAR <= '0';
+				SIG_VGA_PREVCHAR <= '1';
 			end if;
 
 			-- Read character from keyboard module and increment counter
@@ -166,7 +172,8 @@ begin
 		char => SIG_VGA_CHAR,
 		hsync => VGA_HS,
 		vsync => VGA_VS,
-		newchar => SIG_VGA_NEWCHAR,
+		getchar => SIG_VGA_NEWCHAR,
+		chargot => SIG_VGA_GOTCHAR,
 		red => VGA_R,
 		green => VGA_G,
 		blue => VGA_B

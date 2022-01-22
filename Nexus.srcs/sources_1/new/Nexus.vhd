@@ -93,12 +93,6 @@ architecture Behavioral of Nexus is
 	
 	-- Inverse of RESET
 	signal SIG_RESET			: std_logic;
-
-	-- Buffer (71 8-bit characters * 30 rows = 2130 elements)
-	-- TODO: Make line shorter (we only need the amount of characters that the longest line needs)
-	-- TODO: Check if this is valid RAM (it's probably not)
-	--type Buffer_type is array (0 to 2130) of std_logic_vector (7 downto 0);
-	--signal CODE_BUFFER			: Buffer_type;
 	
 	-- Code buffer signals
 	signal SIG_BUFFER_WE		: std_logic_vector(0 downto 0);
@@ -109,7 +103,6 @@ architecture Behavioral of Nexus is
 	signal SIG_BUFFER_DATA_B	: std_logic_vector(7 downto 0);
 	signal SIG_BUFFER_RESET		: std_logic;
 	signal SIG_BUFFER_BUSY_A	: std_logic;
-	signal SIG_BUFFER_BUSY_B	: std_logic;
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
@@ -120,13 +113,13 @@ architecture Behavioral of Nexus is
 
 	-- Keyboard signals
 	signal SIG_KEYBOARD_CHAR	: std_logic_vector (7 downto 0);
-	signal SIG_KEYBOARD_COUNTER	: unsigned (11 downto 0) := (others => '0');
+	signal SIG_KEYBOARD_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_KEYBOARD_ENTER	: std_logic;
 	signal SIG_KEYBOARD_EOT		: std_logic;
 
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
-	signal SIG_EXECUTOR_COUNTER	: unsigned (11 downto 0) := (others => '0');
+	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_ENABLE	: std_logic;
 
 begin
@@ -139,37 +132,30 @@ begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_KEYBOARD_COUNTER <= (others => '0');
-			elsif SIG_KEYBOARD_COUNTER = 480 then
-				-- TODO: Fix resetting buffer
-			elsif SIG_KEYBOARD_EOT = '1' then
-				--CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
-				--SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-				SIG_BUFFER_WE <= "1";
-				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-				SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
-				SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-		
-				--if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
-				--	SIG_KEYBOARD_ENTER <= '1';
-				--end if;
-				
-				-- TODO: Shift buffer when it's full
-				-- if SIG_KEYBOARD_COUNTER = 2130 then
-				--		CODE_BUFFER(0 to 2130) <= CODE_BUFFER(71 to 2130);
-				-- end if;
-			else
-				SIG_BUFFER_WE <= "0";
-				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
-
-				if SIG_BUFFER_DATA_A = "01011010" then
-					SIG_KEYBOARD_ENTER <= '1';
+				SIG_BUFFER_RESET <= '1';
+			elsif SIG_BUFFER_BUSY_A = '0' then
+				if SIG_KEYBOARD_COUNTER = 480 then
+					SIG_BUFFER_RESET <= '1';
+				elsif SIG_KEYBOARD_EOT = '1' then
+					SIG_BUFFER_WE <= "1";
+					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+					SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+					SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+				else
+					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
+					
+					if SIG_BUFFER_DATA_A = "01011010" then
+						SIG_KEYBOARD_ENTER <= '1';
+					end if;
 				end if;
 			end if;
+			
+			SIG_BUFFER_RESET <= '0';
 		end if;
 	end process;
 	
 	-- Read character from buffer and send it to VGA module
-	vga_proc: process(CLOCK, SIG_RESET)
+	vga_proc: process(CLOCK, SIG_RESET, SIG_VGA_NEWCHAR)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
@@ -190,29 +176,21 @@ begin
 			end if;
 		end if;
 	end process;
-
---	ram_proc: process(CLOCK, SIG_VGA_NEWCHAR, SIG_VGA_PREVCHAR, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE, SIG_RESET)
---	begin
-
---		if rising_edge(CLOCK) then
-
---			if SIG_RESET = '1' then
-				
---				SIG_EXECUTOR_COUNTER <= (others => '0');
---			end if;
-
-
-
---			-- Send character to executor module and increment counter
---			if SIG_EXECUTOR_ENABLE = '1' then
---				-- TODO: Check if counter is larger than buffer size, if so, start reading from one line above (not from beginning)
---				SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
---				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
---				SIG_EXECUTOR_ENABLE <= '0';
---			end if;
-
---		end if;
---	end process;
+	
+	executor_proc: process(CLOCK, SIG_RESET, SIG_EXECUTOR_ENABLE)
+	begin
+		if rising_edge(CLOCK) then
+			if SIG_RESET = '1' then
+				SIG_EXECUTOR_COUNTER <= (others => '0');
+			elsif SIG_EXECUTOR_ENABLE = '1' then
+				SIG_BUFFER_WE <= "0";
+				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
+				SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
+				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+				SIG_EXECUTOR_ENABLE <= '0';
+			end if;
+		end if;
+	end process;
 
 	module_executor: Executor
 	port map (
@@ -264,9 +242,9 @@ begin
 		web => "0",
 		addrb => "00000",
 		dinb => "00000000",
-		doutb => SIG_BUFFER_DATA_B,
+		doutb => open,
 		rsta_busy => SIG_BUFFER_BUSY_A,
-		rstb_busy => SIG_BUFFER_BUSY_B
+		rstb_busy => open
 	);
 
 end architecture;

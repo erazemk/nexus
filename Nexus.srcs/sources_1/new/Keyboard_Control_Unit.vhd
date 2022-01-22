@@ -11,7 +11,7 @@ entity Keyboard_Control_Unit is
 		we      : out std_logic;
 		eot     : out std_logic
 	);
-end Keyboard_Control_Unit;
+end entity;
 
 architecture Behavioral of Keyboard_Control_Unit is
     -- STANJA
@@ -133,4 +133,4 @@ begin
 		end case;
 	end process;
 
-end Behavioral;
+end architecture;

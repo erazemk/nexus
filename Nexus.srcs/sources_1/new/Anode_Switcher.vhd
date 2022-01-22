@@ -13,7 +13,7 @@ entity Anode_Switcher is
 		anode	: out std_logic_vector (7 downto 0)
 	);
 
-end Anode_Switcher;
+end entity;
 
 architecture Behavioral of Anode_Switcher is
 
@@ -63,4 +63,4 @@ begin
 
 	end process;
 
-end Behavioral;
+end architecture;

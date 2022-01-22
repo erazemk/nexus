@@ -1,26 +1,18 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity Keyboard_Pulse_Generator is
     port (
 		clk    : in  std_logic;
 		rst    : in  std_logic;
 		kclk_s : in  std_logic;
-		pulse  : out std_logic);
-end Keyboard_Pulse_Generator;
+		pulse  : out std_logic
+	);
+end entity;
 
 architecture Behavioral of Keyboard_Pulse_Generator is
     -- STANJA 
-	-- Definiramo nov "teven" podatkovni tip (enumerated type).
+	-- Definiramo nov "steven" podatkovni tip (enumerated type).
 	-- Orodje za sintezo izbere najbolji naèin kodiranja stanj
 	type state_type is (S_IDLE, S_PULSE_ON, S_WAIT);
 	signal state, next_state : state_type;
@@ -95,4 +87,4 @@ begin
 	end process;
 
 
-end Behavioral;
+end architecture;

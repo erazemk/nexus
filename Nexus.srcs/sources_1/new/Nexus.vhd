@@ -28,7 +28,7 @@ entity Nexus is
 		RESET	: in std_logic
 	);
 
-end Nexus;
+end entity;
 
 architecture Behavioral of Nexus is
 
@@ -70,7 +70,6 @@ architecture Behavioral of Nexus is
 			kdata	: in std_logic;
 			data	: out std_logic_vector (7 downto 0); -- Character from keyboard
 			eot		: out std_logic -- Signals that a new character was written
-			--enter	: out std_logic -- Signals that a new line was written
 		);
 	end component;
 	
@@ -78,25 +77,27 @@ architecture Behavioral of Nexus is
 	signal SIG_RESET			: std_logic;
 
 	-- Buffer (71 8-bit characters * 30 rows = 2130 elements)
+	-- TODO: Make line shorter (we only need the amount of characters that the longest line needs)
+	-- TODO: Check if this is valid RAM (it's probably not)
 	type Buffer_type is array (0 to 2130) of std_logic_vector (7 downto 0);
 	signal CODE_BUFFER			: Buffer_type;
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
-	signal SIG_VGA_COUNTER		: unsigned (11 downto 0);
+	signal SIG_VGA_COUNTER		: unsigned (11 downto 0) := (others => '0');
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
 	signal SIG_VGA_GOTCHAR		: std_logic;
 
 	-- Keyboard signals
 	signal SIG_KEYBOARD_CHAR	: std_logic_vector (7 downto 0);
-	signal SIG_KEYBOARD_COUNTER	: unsigned (11 downto 0);
+	signal SIG_KEYBOARD_COUNTER	: unsigned (11 downto 0) := (others => '0');
 	signal SIG_KEYBOARD_ENTER	: std_logic;
 	signal SIG_KEYBOARD_EOT		: std_logic;
 
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
-	signal SIG_EXECUTOR_COUNTER	: unsigned (11 downto 0);
+	signal SIG_EXECUTOR_COUNTER	: unsigned (11 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_ENABLE	: std_logic;
 
 begin
@@ -106,19 +107,25 @@ begin
 	ram_proc: process(CLOCK, SIG_VGA_NEWCHAR, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE, SIG_RESET)
 	begin
 
-		if SIG_RESET = '1' then
-			SIG_VGA_COUNTER <= (others => '0');
-			SIG_KEYBOARD_COUNTER <= (others => '0');
-			SIG_EXECUTOR_COUNTER <= (others => '0');
-			CODE_BUFFER <= (others => (others => '0')); -- TODO: Fix resetting buffer
-		end if;
-
 		if rising_edge(CLOCK) then
+
+			if SIG_RESET = '1' then
+				SIG_VGA_COUNTER <= (others => '0');
+				SIG_KEYBOARD_COUNTER <= (others => '0');
+				SIG_EXECUTOR_COUNTER <= (others => '0');
+				-- TODO: Fix resetting buffer
+				CODE_BUFFER <= (others => (others => '0'));
+			end if;
 
 			-- Send character to VGA module and increment counter
 			if SIG_VGA_NEWCHAR = '0' then
 				SIG_VGA_PREVCHAR <= '0';
 			elsif SIG_VGA_NEWCHAR = '1' and SIG_VGA_PREVCHAR = '0' then
+			 	-- Start re-reading from code buffer
+				if (SIG_VGA_COUNTER = 2130) then
+					SIG_VGA_COUNTER <= (others => '0');
+				end if;
+				
 				SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
 				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
 				SIG_VGA_GOTCHAR <= '0';
@@ -143,6 +150,7 @@ begin
 
 			-- Send character to executor module and increment counter
 			if SIG_EXECUTOR_ENABLE = '1' then
+				-- TODO: Check if counter is larger than buffer size, if so, start reading from one line above (not from beginning)
 				SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
 				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
 				SIG_EXECUTOR_ENABLE <= '0';
@@ -187,7 +195,6 @@ begin
 		kdata => KDATA,
 		data => SIG_KEYBOARD_CHAR,
 		eot => SIG_KEYBOARD_EOT
-		--enter => SIG_KEYBOARD_ENTER
 	);
 
-end Behavioral;
+end architecture;

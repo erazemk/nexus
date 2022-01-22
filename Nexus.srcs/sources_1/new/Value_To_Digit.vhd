@@ -10,7 +10,7 @@ entity Value_To_Digit is
 		digit	: out std_logic_vector (3 downto 0)
 	);
 
-end Value_To_Digit;
+end entity;
 
 architecture Behavioral of Value_To_Digit is
 
@@ -33,4 +33,4 @@ begin
 
 	end process;
 
-end Behavioral;
+end architecture;

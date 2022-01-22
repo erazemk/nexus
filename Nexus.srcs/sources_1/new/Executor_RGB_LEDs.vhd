@@ -15,7 +15,7 @@ entity Executor_RGB_LEDs is
 		cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
 	);
 
-end Executor_RGB_LEDs;
+end entity;
 
 architecture Behavioral of Executor_RGB_LEDs is
 	
@@ -25,31 +25,32 @@ begin
 
 	process(clock, enable, reset)
 	begin
-		if reset = '1' then
-			cled0 <= (others => '0');
-			cled1 <= (others => '0');
-		end if;
-		-- Write to LED
-		if rising_edge(clock) and enable = '1' then
-			-- Select which LED to address
-			if id = '0' then
-				cled0 <= led;
-			else
-				cled1 <= led;
-			end if;
 		
-			if state = '1' then
-				case color is
-					when "00" => led <= "111";
-					when "01" => led <= "100";
-					when "10" => led <= "010";
-					when "11" => led <= "001";
-				end case;
-			else
-				led <= "000";
+		if rising_edge(clock) then
+			if reset = '1' then
+				cled0 <= (others => '0');
+				cled1 <= (others => '0');
+			elsif enable = '1' then
+				-- Select which LED to address
+				if id = '0' then
+					cled0 <= led;
+				else
+					cled1 <= led;
+				end if;
+			
+				if state = '1' then
+					case color is
+						when "00" => led <= "111";
+						when "01" => led <= "100";
+						when "10" => led <= "010";
+						when "11" => led <= "001";
+					end case;
+				else
+					led <= "000";
+				end if;
 			end if;
 		end if;
 		
 	end process;
 
-end Behavioral;
+end architecture;

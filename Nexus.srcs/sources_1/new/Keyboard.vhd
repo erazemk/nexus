@@ -11,10 +11,9 @@ entity Keyboard is
 		kdata	: in  std_logic;
 		data	: out std_logic_vector (7 downto 0);
 		eot		: out std_logic
-		--enter	: out std_logic
 	);
 
-end Keyboard;
+end entity;
 
 architecture Behavioral of Keyboard is
     
@@ -106,4 +105,4 @@ begin
     end process;
 
 
-end Behavioral;
+end architecture;

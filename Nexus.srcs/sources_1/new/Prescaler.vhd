@@ -15,7 +15,7 @@ entity Prescaler is
 		enable	: out std_logic
 	);
 
-end Prescaler;
+end entity;
 
 architecture Behavioral of Prescaler is
 
@@ -26,13 +26,12 @@ begin
 	
 	process(clock, reset)
 	begin
-		if reset = '1' then
-			count <= (others => '0');
-			enable <= '0';
-		end if;
 
 		if rising_edge(clock) then
-			if count >= max_value - 1 then
+			if reset = '1' then
+				count <= (others => '0');
+				enable <= '0';
+			elsif count >= max_value - 1 then
 				count <= (others => '0');
 				enable <= '1';
 			else
@@ -43,4 +42,4 @@ begin
 
 	end process;
 
-end Behavioral;
+end architecture;

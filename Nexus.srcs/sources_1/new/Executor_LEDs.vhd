@@ -13,7 +13,7 @@ entity Executor_LEDs is
 		led		: out std_logic_vector (15 downto 0) -- Array of LEDs
 	);
 
-end Executor_LEDs;
+end entity;
 
 architecture Behavioral of Executor_LEDs is
 
@@ -22,16 +22,15 @@ begin
 	process(reset, clock, enable)
 	begin
 
-		if reset = '1' then
-			led <= (others => '1');
-		end if;
-
-		-- Write to LED
-		if rising_edge(clock) and enable = '1' then
-			-- 'not state' because LED == off when state == 1
-			led(to_integer(unsigned(id))) <= not state;
+		if rising_edge(clock) then
+			if reset = '1' then
+				led <= (others => '1');
+			elsif enable = '1' then
+				-- 'not state' because LED == off when state == 1
+				led(to_integer(unsigned(id))) <= not state;
+			end if;
 		end if;
 	
 	end process;
 
-end Behavioral;
+end architecture;

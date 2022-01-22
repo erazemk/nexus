@@ -9,7 +9,7 @@ entity Digit_To_Segments is
 		cathode	: out std_logic_vector (7 downto 0)
 	);
 
-end Digit_To_Segments;
+end entity;
 
 architecture Behavioral of Digit_To_Segments is
 
@@ -39,4 +39,4 @@ begin
 
 	end process;
 
-end Behavioral;
+end architecture;

@@ -15,7 +15,7 @@ entity Executor_7_Segment_Display is
 		anode	: out std_logic_vector (7 downto 0)
 	);
 
-end Executor_7_Segment_Display;
+end entity;
 
 architecture Behavioral of Executor_7_Segment_Display is
 
@@ -99,4 +99,4 @@ begin
 		digit => sig_digit
 	);
 
-end Behavioral;
+end architecture;

@@ -17,7 +17,7 @@ entity Executor is
 		cled1	: out std_logic_vector (2 downto 0)
 	);
 
-end Executor;
+end entity;
 
 architecture Behavioral of Executor is
 
@@ -77,13 +77,11 @@ architecture Behavioral of Executor is
 	end component;
 	
 	-- Shared signals
-	signal sig_state		: std_logic;
+	signal sig_state		: std_logic; -- Whether a module is enabled or disabled (e.g. LED = ON/OFF)
 	signal sig_parsed		: std_logic; -- Enabled when parser has parsed line
-	--signal sig_parser_en	: std_logic; -- Signals to the parser to start parsing
-	signal sig_command		: std_logic_vector(1 downto 0);
-	signal sig_id			: std_logic_vector(3 downto 0);
-	signal sig_value		: std_logic_vector(15 downto 0);
-	--signal sig_newchar		: std_logic;
+	signal sig_command		: std_logic_vector(1 downto 0); -- 0 = LED, 1 = RGB LED, 2 = SEG
+	signal sig_id			: std_logic_vector(3 downto 0); -- ID of module element (e.g. LED with ID 1)
+	signal sig_value		: std_logic_vector(15 downto 0); -- Used for RGB LEDs and segments (e.g. CLED 1 R[ed] or SEG 1 BEEF)
 	
 	-- LED signals
 	signal sig_led_enable	: std_logic;
@@ -110,13 +108,8 @@ begin
 	GET_CHAR : process(clock)
 	begin
 		if rising_edge(clock) then
-			--if sig_newchar = '1' then
-			--	enable <= '1';
-			--end if;
-
-			-- if enter = '1' then
-			-- 	sig_parser_en <= '1';
-			-- end if;
+		
+			-- No need for reset, since it's handled in submodules
 
 			if sig_parsed = '1' then
 				enter <= '0';
@@ -125,7 +118,7 @@ begin
 			
 			if enter = '1' then
 				case sig_command is
-					-- TODO: Poglej kdaj moraš resetirat enable
+					-- TODO: Check when to reset 'enable'
 					when "00" => sig_led_enable <= '1';
 					when "01" => sig_rgb_enable <= '1';
 					when "10" =>
@@ -192,7 +185,7 @@ begin
 		seg_id => sig_seg_id,
 		onoff => sig_state,
 		value => sig_value,
-		newchar => enable --sig_newchar
+		newchar => enable
 	);
 
-end Behavioral;
+end architecture;

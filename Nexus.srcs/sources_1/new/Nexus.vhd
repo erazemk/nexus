@@ -239,9 +239,9 @@ begin
 		dina => SIG_BUFFER_DIN,
 		douta => SIG_BUFFER_DATA_A,
 		clkb => CLOCK,
-		web => "0",
-		addrb => "00000",
-		dinb => "00000000",
+		web => (others => '0'),
+		addrb => (others => '0'),
+		dinb => (others => '0'),
 		doutb => open,
 		rsta_busy => SIG_BUFFER_BUSY_A,
 		rstb_busy => open

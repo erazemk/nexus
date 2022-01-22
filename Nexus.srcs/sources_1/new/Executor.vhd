@@ -9,7 +9,8 @@ entity Executor is
 		reset	: in std_logic;
 		enter	: inout std_logic;
 		data	: in std_logic_vector (7 downto 0);
-		enable	: inout std_logic;
+		enable	: out std_logic;
+		isready	: in std_logic;
 		led		: out std_logic_vector (15 downto 0);
 		anode	: out std_logic_vector (7 downto 0);
 		cathode	: out std_logic_vector (7 downto 0);
@@ -72,7 +73,8 @@ architecture Behavioral of Executor is
 			seg_id	: out std_logic;
 			onoff	: out std_logic;
 			value	: out std_logic_vector(15 downto 0);
-			newchar	: inout std_logic
+			newchar	: out std_logic;
+			isready	: in std_logic
 		);
 	end component;
 	
@@ -185,7 +187,8 @@ begin
 		seg_id => sig_seg_id,
 		onoff => sig_state,
 		value => sig_value,
-		newchar => enable
+		newchar => enable,
+		isready => isready
 	);
 
 end architecture;

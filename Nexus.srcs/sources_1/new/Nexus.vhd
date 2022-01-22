@@ -38,7 +38,8 @@ architecture Behavioral of Nexus is
 			reset	: in std_logic;
 			enter	: inout std_logic; -- Signals that a new line has been written
 			data	: in std_logic_vector (7 downto 0); -- Character read from the buffer
-			enable	: inout std_logic; -- Signals that a new character should be sent to data
+			enable	: out std_logic; -- Signals that a new character should be sent to data
+			isready	: in std_logic;
 			led		: out std_logic_vector (15 downto 0); -- LEDs
 			anode	: out std_logic_vector (7 downto 0); -- 7-seg anode
 			cathode	: out std_logic_vector (7 downto 0); -- 7-seg cathode
@@ -120,14 +121,15 @@ architecture Behavioral of Nexus is
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
 	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
-	signal SIG_EXECUTOR_ENABLE	: std_logic;
+	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
+	signal SIG_EXECUTOR_READY	: std_logic;
 
 begin
 
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE)
+	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
@@ -142,13 +144,14 @@ begin
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
 					SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
 					SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-				elsif SIG_EXECUTOR_ENABLE = '1' then
+				elsif SIG_EXECUTOR_NEWCHAR = '1' then
 					SIG_BUFFER_WE <= "0";
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
 					SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
 					SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-					SIG_EXECUTOR_ENABLE <= '0';
+					SIG_EXECUTOR_READY <= '1';
 				else
+					SIG_EXECUTOR_READY <= '0';
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
 					
 					if SIG_BUFFER_DATA_A = "01011010" then
@@ -189,7 +192,8 @@ begin
 		clock => CLOCK,
 		reset => SIG_RESET,
 		enter => SIG_KEYBOARD_ENTER,
-		enable => SIG_EXECUTOR_ENABLE,
+		enable => SIG_EXECUTOR_NEWCHAR,
+		isready => SIG_EXECUTOR_READY,
 		data => SIG_EXECUTOR_CHAR,
 		led => LED,
 		anode => AN,

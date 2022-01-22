@@ -14,7 +14,8 @@ entity Executor_Parser is
 		seg_id	: out std_logic;
 		onoff	: out std_logic;
 		value	: out std_logic_vector(15 downto 0);
-		newchar : inout std_logic
+		newchar : out std_logic;
+		isready	: in std_logic
 	);
 end entity;
 
@@ -26,7 +27,7 @@ architecture Behavioral of Executor_Parser is
 
 begin
 
-	process(clock, reset, state, next_space, enable, skip, newchar, symbol, first_o, command)
+	process(clock, reset, state, next_space, enable, skip, isready, symbol, first_o, command)
 		variable val : std_logic_vector(3 downto 0);
 	begin
 	
@@ -37,6 +38,7 @@ begin
 				parsed <= '0';
 				skip <= '0';
 				first_o <= '0';
+				newchar <= '0';
 			else
 				-- Sync process
 				if symbol /= "01011010" then --ni Enter oz konec ukaza
@@ -54,7 +56,7 @@ begin
 				end if;
 	
 				-- Next state decode
-				if newchar = '0' then
+				if isready = '1' then
 					next_state <= state;
 					case state is
 						when S_IDLE =>
@@ -92,7 +94,6 @@ begin
 						when others =>
 							next_state <= S_IDLE;
 					  end case;
-					  newchar <= '1';
 				end if;
 	
 				-- Output decode
@@ -298,6 +299,9 @@ begin
 				end case;
 	
 			end if;
+			
+			-- TODO: Toggle newchar before requesting a new character
+			newchar <= '1';
 
 		end if;
 

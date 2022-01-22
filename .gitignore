@@ -1,5 +1,6 @@
 # Project directories
 Nexus.cache/
+Nexus.gen/
 Nexus.hw/
 Nexus.ip_user_files/
 Nexus.runs/

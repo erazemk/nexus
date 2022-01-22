@@ -73,18 +73,47 @@ architecture Behavioral of Nexus is
 		);
 	end component;
 	
+	component Code_Buffer is
+		Port (
+			clka		: IN STD_LOGIC;
+			rsta		: IN STD_LOGIC;
+			wea			: IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+			addra		: IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+			dina		: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			douta		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			clkb		: IN STD_LOGIC;
+			web			: IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+			addrb		: IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+			dinb		: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			doutb		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			rsta_busy	: OUT STD_LOGIC;
+			rstb_busy	: OUT STD_LOGIC
+		);
+	end component;
+	
 	-- Inverse of RESET
 	signal SIG_RESET			: std_logic;
 
 	-- Buffer (71 8-bit characters * 30 rows = 2130 elements)
 	-- TODO: Make line shorter (we only need the amount of characters that the longest line needs)
 	-- TODO: Check if this is valid RAM (it's probably not)
-	type Buffer_type is array (0 to 2130) of std_logic_vector (7 downto 0);
-	signal CODE_BUFFER			: Buffer_type;
+	--type Buffer_type is array (0 to 2130) of std_logic_vector (7 downto 0);
+	--signal CODE_BUFFER			: Buffer_type;
+	
+	-- Code buffer signals
+	signal SIG_BUFFER_WE		: std_logic_vector(0 downto 0);
+	signal SIG_BUFFER_ADDR_A	: std_logic_vector(8 downto 0);
+	signal SIG_BUFFER_ADDR_B	: std_logic_vector(8 downto 0);
+	signal SIG_BUFFER_DIN		: std_logic_vector(7 downto 0);
+	signal SIG_BUFFER_DATA_A	: std_logic_vector(7 downto 0);
+	signal SIG_BUFFER_DATA_B	: std_logic_vector(7 downto 0);
+	signal SIG_BUFFER_RESET		: std_logic;
+	signal SIG_BUFFER_BUSY_A	: std_logic;
+	signal SIG_BUFFER_BUSY_B	: std_logic;
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
-	signal SIG_VGA_COUNTER		: unsigned (11 downto 0) := (others => '0');
+	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := (others => '0');
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
 	signal SIG_VGA_GOTCHAR		: std_logic;
@@ -103,61 +132,87 @@ architecture Behavioral of Nexus is
 begin
 
 	SIG_RESET <= not RESET;
-
-	ram_proc: process(CLOCK, SIG_VGA_NEWCHAR, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE, SIG_RESET)
+	
+	-- Read character from keyboard module and write it into
+	keyboard_proc: process(CLOCK, SIG_RESET, SIG_KEYBOARD_EOT)
 	begin
-
 		if rising_edge(CLOCK) then
-
 			if SIG_RESET = '1' then
-				SIG_VGA_COUNTER <= (others => '0');
 				SIG_KEYBOARD_COUNTER <= (others => '0');
-				SIG_EXECUTOR_COUNTER <= (others => '0');
+			elsif SIG_KEYBOARD_COUNTER = 480 then
 				-- TODO: Fix resetting buffer
-				CODE_BUFFER <= (others => (others => '0'));
-			end if;
-
-			-- Send character to VGA module and increment counter
-			if SIG_VGA_NEWCHAR = '0' then
-				SIG_VGA_PREVCHAR <= '0';
-			elsif SIG_VGA_NEWCHAR = '1' and SIG_VGA_PREVCHAR = '0' then
-			 	-- Start re-reading from code buffer
-				if (SIG_VGA_COUNTER = 2130) then
-					SIG_VGA_COUNTER <= (others => '0');
-				end if;
-				
-				SIG_VGA_CHAR <= CODE_BUFFER(to_integer(SIG_VGA_COUNTER));
-				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
-				SIG_VGA_GOTCHAR <= '0';
-				SIG_VGA_PREVCHAR <= '1';
-			end if;
-
-			-- Read character from keyboard module and increment counter
-			if SIG_KEYBOARD_EOT = '1' then
-				CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
+			elsif SIG_KEYBOARD_EOT = '1' then
+				--CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER)) <= SIG_KEYBOARD_CHAR;
+				--SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+				SIG_BUFFER_WE <= "1";
+				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+				SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
 				SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-
-				if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
-					SIG_KEYBOARD_ENTER <= '1';
-				end if;
+		
+				--if CODE_BUFFER(to_integer(SIG_KEYBOARD_COUNTER) - 1) = "01011010" then
+				--	SIG_KEYBOARD_ENTER <= '1';
+				--end if;
 				
 				-- TODO: Shift buffer when it's full
 				-- if SIG_KEYBOARD_COUNTER = 2130 then
 				--		CODE_BUFFER(0 to 2130) <= CODE_BUFFER(71 to 2130);
 				-- end if;
-				
-			end if;
+			else
+				SIG_BUFFER_WE <= "0";
+				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
 
-			-- Send character to executor module and increment counter
-			if SIG_EXECUTOR_ENABLE = '1' then
-				-- TODO: Check if counter is larger than buffer size, if so, start reading from one line above (not from beginning)
-				SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
-				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-				SIG_EXECUTOR_ENABLE <= '0';
+				if SIG_BUFFER_DATA_A = "01011010" then
+					SIG_KEYBOARD_ENTER <= '1';
+				end if;
 			end if;
-
 		end if;
 	end process;
+	
+	-- Read character from buffer and send it to VGA module
+	vga_proc: process(CLOCK, SIG_RESET)
+	begin
+		if rising_edge(CLOCK) then
+			if SIG_RESET = '1' then
+				SIG_VGA_COUNTER <= (others => '0');
+			elsif SIG_VGA_NEWCHAR = '0' then
+				SIG_VGA_PREVCHAR <= '0';
+			-- If a new character has been requested
+			elsif SIG_VGA_NEWCHAR = '1' and SIG_VGA_PREVCHAR = '0' then
+				-- Start re-reading from code buffer
+				if (SIG_VGA_COUNTER = 480) then
+					SIG_VGA_COUNTER <= (others => '0');
+				end if;
+		
+				SIG_BUFFER_ADDR_B <= std_logic_vector(SIG_VGA_COUNTER);
+				SIG_VGA_CHAR <= SIG_BUFFER_DATA_B;
+				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
+				SIG_VGA_PREVCHAR <= '1';
+			end if;
+		end if;
+	end process;
+
+--	ram_proc: process(CLOCK, SIG_VGA_NEWCHAR, SIG_VGA_PREVCHAR, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE, SIG_RESET)
+--	begin
+
+--		if rising_edge(CLOCK) then
+
+--			if SIG_RESET = '1' then
+				
+--				SIG_EXECUTOR_COUNTER <= (others => '0');
+--			end if;
+
+
+
+--			-- Send character to executor module and increment counter
+--			if SIG_EXECUTOR_ENABLE = '1' then
+--				-- TODO: Check if counter is larger than buffer size, if so, start reading from one line above (not from beginning)
+--				SIG_EXECUTOR_CHAR <= CODE_BUFFER(to_integer(SIG_EXECUTOR_COUNTER));
+--				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+--				SIG_EXECUTOR_ENABLE <= '0';
+--			end if;
+
+--		end if;
+--	end process;
 
 	module_executor: Executor
 	port map (
@@ -195,6 +250,23 @@ begin
 		kdata => KDATA,
 		data => SIG_KEYBOARD_CHAR,
 		eot => SIG_KEYBOARD_EOT
+	);
+	
+	module_buffer: Code_Buffer
+	port map (
+		clka => CLOCK,
+		rsta => SIG_BUFFER_RESET,
+		wea => SIG_BUFFER_WE,
+		addra => SIG_BUFFER_ADDR_A,
+		dina => SIG_BUFFER_DIN,
+		douta => SIG_BUFFER_DATA_A,
+		clkb => CLOCK,
+		web => "0",
+		addrb => "00000",
+		dinb => "00000000",
+		doutb => SIG_BUFFER_DATA_B,
+		rsta_busy => SIG_BUFFER_BUSY_A,
+		rstb_busy => SIG_BUFFER_BUSY_B
 	);
 
 end architecture;

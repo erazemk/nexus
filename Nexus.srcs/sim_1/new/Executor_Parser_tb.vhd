@@ -63,6 +63,7 @@ begin
 		reset    <= '1';
 		wait for CLK_PERIOD * 3;
 		reset <= '0';
+		seg_id <= '0';
 
         enable <= '1';
         symbol <= "01001011"; --L
@@ -73,7 +74,7 @@ begin
         wait for CLK_PERIOD * 3;
         symbol <= "00101001"; --Space
         wait for CLK_PERIOD * 3;
-        symbol <= "00010110"; --1
+        symbol <= "00011110"; --1
         wait for CLK_PERIOD * 3;
         symbol <= "00101001"; --Space
         wait for CLK_PERIOD * 3;

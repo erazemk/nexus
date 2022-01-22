@@ -58,6 +58,7 @@ architecture Behavioral of VGA is
 			reset		: in std_logic;
 			read		: in std_logic;
 			charready	: in std_logic;
+			debug       : in std_logic;
 			column		: in unsigned (9 downto 0);
 			row			: in unsigned (9 downto 0);
 			matrix		: in std_logic_vector (16 * 9 - 1 downto 0);
@@ -124,6 +125,7 @@ begin
 		reset => reset,
 		read => read0,
 		charready => charready,
+		debug => '0',
 		column => column,
 		row => row,
 		matrix => matrix,
@@ -139,6 +141,7 @@ begin
 		reset => reset,
 		read => read1,
 		charready => charready,
+		debug => '1',
 		column => column,
 		row => row,
 		matrix => matrix,

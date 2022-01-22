@@ -1,9 +1,6 @@
-*.wpc
-*.lpr
-*.xpr
-
 # Project directories
 Nexus.cache/
+Nexus.hw/
 Nexus.ip_user_files/
 Nexus.runs/
-Nexus.srcs/utils*
+Nexus.sim/

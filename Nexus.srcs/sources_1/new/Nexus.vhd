@@ -127,11 +127,12 @@ begin
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	keyboard_proc: process(CLOCK, SIG_RESET, SIG_KEYBOARD_EOT)
+	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_ENABLE)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_KEYBOARD_COUNTER <= (others => '0');
+				SIG_EXECUTOR_COUNTER <= (others => '0');
 				SIG_BUFFER_RESET <= '1';
 			elsif SIG_BUFFER_BUSY_A = '0' then
 				if SIG_KEYBOARD_COUNTER = 480 then
@@ -141,6 +142,12 @@ begin
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
 					SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
 					SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+				elsif SIG_EXECUTOR_ENABLE = '1' then
+					SIG_BUFFER_WE <= "0";
+					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
+					SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
+					SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+					SIG_EXECUTOR_ENABLE <= '0';
 				else
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
 					
@@ -173,21 +180,6 @@ begin
 				SIG_VGA_CHAR <= SIG_BUFFER_DATA_B;
 				SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
 				SIG_VGA_PREVCHAR <= '1';
-			end if;
-		end if;
-	end process;
-	
-	executor_proc: process(CLOCK, SIG_RESET, SIG_EXECUTOR_ENABLE)
-	begin
-		if rising_edge(CLOCK) then
-			if SIG_RESET = '1' then
-				SIG_EXECUTOR_COUNTER <= (others => '0');
-			elsif SIG_EXECUTOR_ENABLE = '1' then
-				SIG_BUFFER_WE <= "0";
-				SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
-				SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
-				SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-				SIG_EXECUTOR_ENABLE <= '0';
 			end if;
 		end if;
 	end process;

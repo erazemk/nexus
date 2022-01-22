@@ -40,10 +40,10 @@ begin
 			
 				if state = '1' then
 					case color is
-						when "00" => led <= "111";
 						when "01" => led <= "100";
 						when "10" => led <= "010";
 						when "11" => led <= "001";
+						when others => led <= "111";
 					end case;
 				else
 					led <= "000";

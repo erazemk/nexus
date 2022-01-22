@@ -152,9 +152,9 @@ begin
 	);
 	---------LOGIKA-----------------
 	--moramo gledati spremembo podateka row na vsakih 16 vrstic => (row/16) mod 2 ali pa le preberemo 5. bit row(4)
-	read0 <= h_display and v_display and row(4);
+	read0 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '1') else '0';
 	--Ko se enega bere se iz drugega piše
-	read1 <= h_display and v_display and not row(4);
+	read1 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '0') else '0';
 	
 	
 	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov

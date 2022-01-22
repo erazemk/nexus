@@ -79,20 +79,28 @@ architecture Behavioral of VGA is
 ---SIGNALI
 
 	signal clock_enable		: std_logic;
+	
 	signal h_display		: std_logic;
 	signal v_display		: std_logic;
+	
 	signal read0			: std_logic := '0';
 	signal read1			: std_logic := '0';
+	
 	signal column			: unsigned(9 downto 0);
 	signal row				: unsigned(9 downto 0);
 	signal border_on		: std_logic;
+	
     signal ascii			: std_logic_vector(7 downto 0);
     signal offset			: std_logic_vector (3 downto 0);
     signal data			    : std_logic_vector(7 downto 0);
+    
+    signal offset0			: std_logic_vector (3 downto 0);
 	signal getchar0			: std_logic;
 	signal red0				: std_logic_vector (3 downto 0);
 	signal green0			: std_logic_vector (3 downto 0);
 	signal blue0			: std_logic_vector (3 downto 0);
+	
+	signal offset1			: std_logic_vector (3 downto 0);
 	signal getchar1			: std_logic;
 	signal red1				: std_logic_vector (3 downto 0);
 	signal green1			: std_logic_vector (3 downto 0);
@@ -129,7 +137,7 @@ begin
 	module_ASCII_to_px: VGA_ASCII_To_Pixel
 	port map (
         clk => clock,
-        addr  => ascii & offset,
+        addr  => ascii(6 downto 0) & offset,
         data => data
 	);
 
@@ -142,6 +150,7 @@ begin
 		column => column,
 		row => row,
 		data => data,
+		offset => offset0,
 		getchar => getchar0,
 		red => red0,
 		green => green0,
@@ -157,6 +166,7 @@ begin
 		column => column,
 		row => row,
 		data => data,
+		offset => offset1,
 		getchar => getchar1,
 		red => red1,
 		green => green1,
@@ -170,6 +180,7 @@ begin
 	
 	
 	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov
+	offset <= offset0 or offset1;
 	getchar <= getchar0 or getchar1;
 	red <= red0 or red1;
 	green <= green0 or green1;

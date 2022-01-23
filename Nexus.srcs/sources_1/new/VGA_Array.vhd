@@ -27,9 +27,8 @@ type memory_type is array (0 to 15) of std_logic_vector(0 to 639);
     
     signal write_column : integer := 0;
     signal i            : unsigned (4 downto 0) := "10001";
-  
-begin
 
+begin
 process(clock)
     begin
         if rising_edge(clock) then
@@ -43,7 +42,7 @@ process(clock)
                 memory <= (others => (others => '0'));
             else
                 if read='1' then
-                    if memory(to_integer(row) mod 16)(to_integer(column)) = '1' then
+                    if memory(to_integer(row(3 downto 0)))(to_integer(column)) = '1' then
                         red <= "0000";
                         green <= "1111";
                         blue <= "0000";

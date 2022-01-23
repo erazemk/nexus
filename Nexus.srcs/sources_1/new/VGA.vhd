@@ -8,7 +8,6 @@ entity VGA is
 		clock	: in std_logic;
 		reset	: in std_logic;
 		char	: in std_logic_vector (7 downto 0);
-		chargot : in std_logic;
 		getchar	: out std_logic;
 		hsync	: out std_logic;
 		vsync	: out std_logic;
@@ -45,7 +44,6 @@ architecture Behavioral of VGA is
     
     component VGA_PS2ID_To_ASCII is
 		Port (
-            clk       : in std_logic;
             ps2id     : in std_logic_vector(7 downto 0);
             ascii     : out std_logic_vector(7 downto 0)
 		);
@@ -89,6 +87,7 @@ architecture Behavioral of VGA is
 	signal column			: unsigned(9 downto 0);
 	signal row				: unsigned(9 downto 0);
 	signal border_on		: std_logic;
+	signal addr			    : std_logic_vector(10 downto 0);
 	
     signal ascii			: std_logic_vector(7 downto 0);
     signal offset			: std_logic_vector (3 downto 0);
@@ -107,6 +106,23 @@ architecture Behavioral of VGA is
 	signal blue1			: std_logic_vector (3 downto 0);
 begin
 
+    ---------LOGIKA-----------------
+    addr <= ascii(6 downto 0) & offset;
+    
+	--moramo gledati spremembo podateka row na vsakih 16 vrstic => (row/16) mod 2 ali pa le preberemo 5. bit row(4)
+	read0 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '1') else '0';
+	--Ko se enega bere se iz drugega piše
+	read1 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '0') else '0';
+	
+	
+	
+	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov
+	offset <= offset0 or offset1;
+	getchar <= getchar0 or getchar1;
+	red <= red0 or red1;
+	green <= green0 or green1;
+	blue <= blue0 or blue1;
+    
 	module_hsync: VGA_HSync_Instance
 	port map (
 		clk => clock,
@@ -129,7 +145,6 @@ begin
 	
 	module_PS2ID_to_ASCII: VGA_PS2ID_To_ASCII
 	port map (
-        clk => clock,
         ps2id  => char,
         ascii => ascii
 	);
@@ -137,7 +152,7 @@ begin
 	module_ASCII_to_px: VGA_ASCII_To_Pixel
 	port map (
         clk => clock,
-        addr  => ascii(6 downto 0) & offset,
+        addr  => addr,
         data => data
 	);
 
@@ -171,19 +186,6 @@ begin
 		red => red1,
 		green => green1,
 		blue => blue1
-	);
-	---------LOGIKA-----------------
-	--moramo gledati spremembo podateka row na vsakih 16 vrstic => (row/16) mod 2 ali pa le preberemo 5. bit row(4)
-	read0 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '1') else '0';
-	--Ko se enega bere se iz drugega piše
-	read1 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '0') else '0';
-	
-	
-	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov
-	offset <= offset0 or offset1;
-	getchar <= getchar0 or getchar1;
-	red <= red0 or red1;
-	green <= green0 or green1;
-	blue <= blue0 or blue1;
+	);	
 
 end architecture;

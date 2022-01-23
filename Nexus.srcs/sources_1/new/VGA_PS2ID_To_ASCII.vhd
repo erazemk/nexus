@@ -33,7 +33,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity VGA_PS2ID_To_ASCII is
     Port (
-      clk       : in std_logic;
       ps2id     : in std_logic_vector(7 downto 0);
       ascii     : out std_logic_vector(7 downto 0)
     );
@@ -42,7 +41,7 @@ end entity;
 architecture Behavioral of VGA_PS2ID_To_ASCII is
 
 begin
-  process(clk)
+  process(ps2id)
   begin
     case ps2id IS
  

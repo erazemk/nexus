@@ -20,14 +20,15 @@ architecture Behavioral of Executor_Parser_tb is
 		seg_id	: out std_logic;
 		onoff	: out std_logic;
 		value	: out std_logic_vector(15 downto 0);
-		newchar : inout std_logic
+		newchar : out std_logic;
+		isready	: in std_logic
 	);
 end component;
 
-signal clock, reset, enable, parsed, newchar : std_logic := '0';
+signal clock, reset, enable, parsed, isready : std_logic := '0';
 signal symbol : std_logic_vector(7 downto 0) := "00000000";
 
-signal cled_id, seg_id, onoff: std_logic;
+signal cled_id, seg_id, onoff, newchar: std_logic;
 signal value : std_logic_vector(15 downto 0);
 signal led_id : std_logic_vector(3 downto 0);
 signal command : std_logic_vector(1 downto 0);
@@ -48,7 +49,8 @@ begin
 			seg_id	=> seg_id,
 			onoff	=> onoff,
 			value	=> value,
-			newchar => newchar
+			newchar => newchar,
+			isready => isready
 		);
 	
 	CLK_STIMULUS : process
@@ -63,10 +65,10 @@ begin
 		reset    <= '1';
 		wait for CLK_PERIOD * 3;
 		reset <= '0';
-		seg_id <= '0';
 
         enable <= '1';
         symbol <= "01001011"; --L
+        isready <= '1';
         wait for CLK_PERIOD * 3;
         symbol <= "00100100"; --E
         wait for CLK_PERIOD * 3;

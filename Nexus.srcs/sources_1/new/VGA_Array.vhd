@@ -61,7 +61,7 @@ process(clock)
                     end if;    
                     write_column <= 0;
                 elsif write = '1' and  write_column < 128 then  
-                    if  i > "10000" then
+                    if  i(4) = '0' then
                         memory(to_integer(i))(write_column + 7 downto write_column) <= data;
                         i <= i + 1; 
                         offset <= std_logic_vector(i(3 downto 0));            
@@ -73,7 +73,7 @@ process(clock)
                     elsif i= "10001" then
                         getchar <= '1';
                         i <= i + 1;
-                    elsif i > "10100" then
+                    elsif i(2) = '0' then
                         getchar <= '0';
                         i <= i + 1;
                     else

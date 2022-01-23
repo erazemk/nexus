@@ -122,7 +122,7 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
 	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
-	signal SIG_EXECUTOR_READY	: std_logic;
+	signal SIG_EXECUTOR_READY	: std_logic := '0';
 
 begin
 

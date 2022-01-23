@@ -236,9 +236,9 @@ begin
 		douta => SIG_BUFFER_DATA_A,
 		clkb => CLOCK,
 		web => (others => '0'),
-		addrb => (others => '0'),
+		addrb => SIG_BUFFER_ADDR_B,
 		dinb => (others => '0'),
-		doutb => open,
+		doutb => SIG_BUFFER_DATA_B,
 		rsta_busy => SIG_BUFFER_BUSY_A,
 		rstb_busy => open
 	);

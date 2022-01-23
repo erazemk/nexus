@@ -34,17 +34,18 @@ architecture Behavioral of Nexus is
 
 	component Executor is
 		Port (
-			clock	: in std_logic;
-			reset	: in std_logic;
-			enter	: inout std_logic; -- Signals that a new line has been written
-			data	: in std_logic_vector (7 downto 0); -- Character read from the buffer
-			enable	: out std_logic; -- Signals that a new character should be sent to data
-			isready	: in std_logic;
-			led		: out std_logic_vector (15 downto 0); -- LEDs
-			anode	: out std_logic_vector (7 downto 0); -- 7-seg anode
-			cathode	: out std_logic_vector (7 downto 0); -- 7-seg cathode
-			cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
-			cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
+			clock			: in std_logic;
+			reset			: in std_logic;
+			enter			: in std_logic; -- Signals that a new line has been written
+			enter_confirm	: out std_logic;
+			data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
+			enable			: out std_logic; -- Signals that a new character should be sent to data
+			isready			: in std_logic;
+			led				: out std_logic_vector (15 downto 0); -- LEDs
+			anode			: out std_logic_vector (7 downto 0); -- 7-seg anode
+			cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
+			cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
+			cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
 		);
 	end component;
 
@@ -55,7 +56,6 @@ architecture Behavioral of Nexus is
 			hsync	: out std_logic;
 			vsync	: out std_logic;
 			char	: in std_logic_vector (7 downto 0);
-			chargot : in std_logic;
 			getchar	: out std_logic;
 			red		: out std_logic_vector (3 downto 0);
 			green	: out std_logic_vector (3 downto 0);
@@ -110,12 +110,12 @@ architecture Behavioral of Nexus is
 	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := (others => '0');
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
-	signal SIG_VGA_GOTCHAR		: std_logic;
 
 	-- Keyboard signals
 	signal SIG_KEYBOARD_CHAR	: std_logic_vector (7 downto 0);
 	signal SIG_KEYBOARD_COUNTER	: unsigned (8 downto 0) := (others => '0');
-	signal SIG_KEYBOARD_ENTER	: std_logic;
+	signal SIG_KEYBOARD_ENTER	: std_logic; -- Set by nexus to signal an Enter key was pressed
+	signal SIG_KEYBOARD_CONFIRM	: std_logic; -- Confirmation from parser that the line was parsed
 	signal SIG_KEYBOARD_EOT		: std_logic;
 
 	-- Executor signals
@@ -129,7 +129,7 @@ begin
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR)
+	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR, SIG_KEYBOARD_CONFIRM)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
@@ -156,6 +156,10 @@ begin
 					
 					if SIG_BUFFER_DATA_A = "01011010" then
 						SIG_KEYBOARD_ENTER <= '1';
+					end if;
+					
+					if SIG_KEYBOARD_CONFIRM = '1' then
+						SIG_KEYBOARD_ENTER <= '0';
 					end if;
 				end if;
 			end if;
@@ -192,6 +196,7 @@ begin
 		clock => CLOCK,
 		reset => SIG_RESET,
 		enter => SIG_KEYBOARD_ENTER,
+		enter_confirm => SIG_KEYBOARD_CONFIRM,
 		enable => SIG_EXECUTOR_NEWCHAR,
 		isready => SIG_EXECUTOR_READY,
 		data => SIG_EXECUTOR_CHAR,
@@ -210,7 +215,6 @@ begin
 		hsync => VGA_HS,
 		vsync => VGA_VS,
 		getchar => SIG_VGA_NEWCHAR,
-		chargot => SIG_VGA_GOTCHAR,
 		red => VGA_R,
 		green => VGA_G,
 		blue => VGA_B

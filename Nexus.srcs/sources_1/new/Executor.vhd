@@ -5,17 +5,18 @@ use IEEE.NUMERIC_STD.ALL;
 entity Executor is
 
 	Port (
-		clock	: in std_logic;
-		reset	: in std_logic;
-		enter	: inout std_logic;
-		data	: in std_logic_vector (7 downto 0);
-		enable	: out std_logic;
-		isready	: in std_logic;
-		led		: out std_logic_vector (15 downto 0);
-		anode	: out std_logic_vector (7 downto 0);
-		cathode	: out std_logic_vector (7 downto 0);
-		cled0	: out std_logic_vector (2 downto 0);
-		cled1	: out std_logic_vector (2 downto 0)
+		clock			: in std_logic;
+		reset			: in std_logic;
+		enter			: in std_logic; -- Signals that a new line has been written
+		enter_confirm	: out std_logic;
+		data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
+		enable			: out std_logic; -- Signals that a new character should be sent to data
+		isready			: in std_logic;
+		led				: out std_logic_vector (15 downto 0); -- LEDs
+		anode			: out std_logic_vector (7 downto 0); -- 7-seg anode
+		cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
+		cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
+		cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
 	);
 
 end entity;
@@ -62,19 +63,20 @@ architecture Behavioral of Executor is
 
 	component Executor_Parser is
 		Port ( 
-			clock	: in std_logic;
-			reset	: in std_logic;
-			symbol	: in std_logic_vector(7 downto 0);
-			enable	: in std_logic;
-			parsed	: inout std_logic;
-			command	: inout std_logic_vector(1 downto 0);
-			led_id	: out std_logic_vector(3 downto 0);
-			cled_id	: out std_logic;
-			seg_id	: out std_logic;
-			onoff	: out std_logic;
-			value	: out std_logic_vector(15 downto 0);
-			newchar	: out std_logic;
-			isready	: in std_logic
+			clock			: in std_logic;
+			reset			: in std_logic;
+			symbol			: in std_logic_vector(7 downto 0);
+			enable			: in std_logic;
+			enable_confirm	: out std_logic;
+			parsed			: inout std_logic;
+			command			: inout std_logic_vector(1 downto 0);
+			led_id			: out std_logic_vector(3 downto 0);
+			cled_id			: out std_logic;
+			seg_id			: out std_logic;
+			onoff			: out std_logic;
+			value			: out std_logic_vector(15 downto 0);
+			newchar			: out std_logic;
+			isready			: in std_logic
 		);
 	end component;
 	
@@ -112,15 +114,17 @@ begin
 		if rising_edge(clock) then
 		
 			-- No need for reset, since it's handled in submodules
+			
+			-- Reset enter_confirm
+			if enter = '0' then
+				enter_confirm <= '0';
+			end if;
 
 			if sig_parsed = '1' then
-				enter <= '0';
+				enter_confirm <= '1';
 				sig_parsed <= '0';
-			end if;
-			
-			if enter = '1' then
+				
 				case sig_command is
-					-- TODO: Check when to reset 'enable'
 					when "00" => sig_led_enable <= '1';
 					when "01" => sig_rgb_enable <= '1';
 					when "10" =>
@@ -131,7 +135,7 @@ begin
 							sig_seg2_state <= sig_state;
 							sig_seg_value(31 downto 16) <= sig_value;
 						end if;
-
+	
 						sig_seg_enable <= '1';
 					when others => sig_led_enable <= '1';
 				end case;
@@ -180,6 +184,7 @@ begin
 		reset => reset,
 		symbol => data,
 		enable => enter,
+		enable_confirm => enter_confirm,
 		parsed => sig_parsed,
 		command => sig_command,
 		led_id => sig_led_id,

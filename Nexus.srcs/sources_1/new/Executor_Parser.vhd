@@ -103,7 +103,7 @@ begin
 					when S_SKIP =>
 						--
 					when S_COMMAND =>
-						if symbol = "L" then
+						if symbol = "01001011" then -- symbol = L
 							command <= "00";
 							skip <= '1';
 						elsif symbol = "00100001" then -- symbol = C

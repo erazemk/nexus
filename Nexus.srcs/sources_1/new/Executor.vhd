@@ -63,20 +63,19 @@ architecture Behavioral of Executor is
 
 	component Executor_Parser is
 		Port ( 
-			clock			: in std_logic;
-			reset			: in std_logic;
-			symbol			: in std_logic_vector(7 downto 0);
-			enable			: in std_logic;
-			enable_confirm	: out std_logic;
-			parsed			: inout std_logic;
-			command			: inout std_logic_vector(1 downto 0);
-			led_id			: out std_logic_vector(3 downto 0);
-			cled_id			: out std_logic;
-			seg_id			: out std_logic;
-			onoff			: out std_logic;
-			value			: out std_logic_vector(15 downto 0);
-			newchar			: out std_logic;
-			isready			: in std_logic
+			clock	: in std_logic;
+			reset	: in std_logic;
+			symbol	: in std_logic_vector(7 downto 0);
+			enable	: in std_logic;
+			parsed	: inout std_logic;
+			command	: inout std_logic_vector(1 downto 0);
+			led_id	: out std_logic_vector(3 downto 0);
+			cled_id	: out std_logic;
+			seg_id	: out std_logic;
+			onoff	: out std_logic;
+			value	: out std_logic_vector(15 downto 0);
+			newchar	: out std_logic;
+			isready	: in std_logic
 		);
 	end component;
 	
@@ -184,7 +183,6 @@ begin
 		reset => reset,
 		symbol => data,
 		enable => enter,
-		enable_confirm => enter_confirm,
 		parsed => sig_parsed,
 		command => sig_command,
 		led_id => sig_led_id,

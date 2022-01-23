@@ -7,6 +7,7 @@ entity VGA_Array is
         clock		: in std_logic;
 		reset	    : in std_logic;
         read        : in std_logic;
+        write       : in std_logic;
         debug       : in std_logic;
         column	    : in unsigned (9 downto 0);
 		row 	    : in unsigned (9 downto 0);
@@ -59,7 +60,7 @@ process(clock)
                     end case;
                     end if;    
                     write_column <= 0;
-                elsif  write_column < 128 then  
+                elsif write = '1' and  write_column < 128 then  
                     if  i > "10000" then
                         memory(to_integer(i))(write_column + 7 downto write_column) <= data;
                         i <= i + 1; 

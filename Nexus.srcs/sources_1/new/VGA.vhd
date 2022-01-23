@@ -62,6 +62,7 @@ architecture Behavioral of VGA is
 			clock		: in std_logic;
 			reset		: in std_logic;
 			read		: in std_logic;
+			write       : in std_logic;
 			debug       : in std_logic;
 			column		: in unsigned (9 downto 0);
 			row			: in unsigned (9 downto 0);
@@ -161,6 +162,7 @@ begin
 	    clock => clock,
 		reset => reset,
 		read => read0,
+		write => read1,
 		debug => '0',
 		column => column,
 		row => row,
@@ -177,6 +179,7 @@ begin
 		clock => clock,
 		reset => reset,
 		read => read1,
+		write => read0,
 		debug => '1',
 		column => column,
 		row => row,

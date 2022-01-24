@@ -117,6 +117,7 @@ architecture Behavioral of Nexus is
 	signal SIG_KEYBOARD_ENTER	: std_logic; -- Set by nexus to signal an Enter key was pressed
 	signal SIG_KEYBOARD_CONFIRM	: std_logic; -- Confirmation from parser that the line was parsed
 	signal SIG_KEYBOARD_EOT		: std_logic;
+	signal SIG_KEYBOARD_F0		: std_logic;
 
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
@@ -139,11 +140,22 @@ begin
 			elsif SIG_BUFFER_BUSY_A = '0' then
 				if SIG_KEYBOARD_COUNTER = 480 then
 					SIG_BUFFER_RESET <= '1';
+				-- Keyboard has sent new character
 				elsif SIG_KEYBOARD_EOT = '1' then
-					SIG_BUFFER_WE <= "1";
-					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-					SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
-					SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+					-- Previous character was F0 (key was depressed)
+					if SIG_KEYBOARD_F0 = '1' then
+						SIG_KEYBOARD_F0 <= '0';
+					else
+						-- Check if the next char is a depressed previous one
+						if SIG_KEYBOARD_CHAR = "11110000" then -- char = 0xF0
+							SIG_KEYBOARD_F0 <= '1';
+						else
+							SIG_BUFFER_WE <= "1";
+							SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+							SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+							SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+						end if;
+					end if;
 				elsif SIG_EXECUTOR_NEWCHAR = '1' then
 					SIG_BUFFER_WE <= "0";
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);

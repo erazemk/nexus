@@ -53,7 +53,7 @@ architecture Behavioral of VGA is
 		Port (
             clk: in std_logic;
             addr: in std_logic_vector(10 downto 0);
-            data: out std_logic_vector(7 downto 0)
+            data: out std_logic_vector(0 to 7)
 		);
 	end component;
 
@@ -66,7 +66,7 @@ architecture Behavioral of VGA is
 			debug       : in std_logic;
 			column		: in unsigned (9 downto 0);
 			row			: in unsigned (9 downto 0);
-			data        : in std_logic_vector (7 downto 0) := (others => '0');
+			data        : in std_logic_vector (0 to 7) := (others => '0');
 		    offset      : out std_logic_vector (3 downto 0) := (others => '0');
 			getchar		: out std_logic;
 			red			: out std_logic_vector (3 downto 0) := (others => '0');

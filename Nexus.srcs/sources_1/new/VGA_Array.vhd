@@ -11,7 +11,7 @@ entity VGA_Array is
         debug       : in std_logic;
         column	    : in unsigned (9 downto 0);
 		row 	    : in unsigned (9 downto 0);
-		data        : in std_logic_vector (7 downto 0) := (others => '0');
+		data        : in std_logic_vector (0 to 7) := (others => '0');
 		offset      : out std_logic_vector (3 downto 0) := (others => '0');
 		getchar	    : out std_logic := '0';
 		red	      	: out std_logic_vector (3 downto 0) := (others => '0');
@@ -27,7 +27,7 @@ type memory_type is array (0 to 15) of std_logic_vector(0 to 639);
     signal memory       : memory_type := (others => (others => '0'));
     
     signal write_column : integer := 0;
-    signal i            : unsigned (4 downto 0) := "10001";
+    signal i            :  std_logic_vector(4 downto 0) := "10001";
 
 begin
 process(clock)
@@ -62,20 +62,20 @@ process(clock)
                     write_column <= 0;
                 elsif write = '1' and  write_column < 128 then  
                     if  i(4) = '0' then
-                        memory(to_integer(i))(write_column + 7 downto write_column) <= data;
-                        i <= i + 1; 
+                        memory(to_integer(unsigned(i)))(write_column to write_column + 7) <= data;
+                        i <= std_logic_vector(unsigned(i) + 1); 
                         offset <= std_logic_vector(i(3 downto 0));            
                     elsif i= "10000" then
                         write_column <= write_column + 8;
-                        i <= i + 1; 
+                        i <= std_logic_vector(unsigned(i) + 1); 
                         offset <= (others => '0'); 
                     --Pravi zacetek
                     elsif i= "10001" then
                         getchar <= '1';
-                        i <= i + 1;
+                        i <= std_logic_vector(unsigned(i) + 1); 
                     elsif i(2) = '0' then
                         getchar <= '0';
-                        i <= i + 1;
+                        i <= std_logic_vector(unsigned(i) + 1); 
                     else
                         i <= "00000";
                     end if;

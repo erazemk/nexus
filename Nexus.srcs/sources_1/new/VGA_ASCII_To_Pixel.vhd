@@ -13,7 +13,7 @@ entity VGA_ASCII_To_Pixel is
    port(
       clk: in std_logic;
       addr: in std_logic_vector(10 downto 0);
-      data: out std_logic_vector(7 downto 0)
+      data: out std_logic_vector(0 to 7)
    );
 end entity;
 
@@ -22,7 +22,7 @@ architecture Behavioral of VGA_ASCII_To_Pixel is
    constant DATA_WIDTH: integer:=8;
    signal addr_reg: std_logic_vector(ADDR_WIDTH-1 downto 0);
    type rom_type is array (0 to 2**ADDR_WIDTH-1)
-        of std_logic_vector(DATA_WIDTH-1 downto 0);
+        of std_logic_vector(0 to DATA_WIDTH-1);
    -- ROM definition
    constant ROM: rom_type:=(   -- 2^11-by-8
    "00000000", -- 0

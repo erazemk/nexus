@@ -25,8 +25,12 @@ component VGA is
 end component;
 signal clock    : std_logic := '0';
 signal reset    : std_logic;
-signal char     : std_logic_vector (7 downto 0) := "01001011";
-signal getchar    : std_logic;
+signal char     : std_logic_vector (7 downto 0) := "00000000";
+signal getchar  : std_logic;
+
+signal i        : integer := 0;
+type memory_type is array (0 to 479) of std_logic_vector(7 downto 0);
+signal memory       : memory_type := (others => (others => '0'));
 
 constant CLK_PERIOD : time := 10 ns;
 
@@ -45,56 +49,46 @@ UUT : VGA
             blue => open
 
 	);
-	
+
+INIT : process
+	begin
+		reset <= '1';
+		memory(0) <= "01001011"; --L
+		memory(1) <= "00100100"; --E
+		memory(2) <= "00100011"; --D
+		memory(3) <= "00101001"; --Space
+		memory(4) <= "00011110"; --1
+		memory(5) <= "00101001"; --Space
+		memory(6) <= "01000100"; --O
+		memory(7) <= "00110001"; --N
+		memory(8) <= "01011010"; --Enter
+		--New Line
+		memory(16) <= "01001011"; --L
+		memory(17) <= "00100100"; --E
+		memory(18) <= "00100011"; --D
+		memory(19) <= "00101001"; --Space
+		memory(20) <= "00011110"; --1
+		memory(21) <= "00101001"; --Space
+		memory(22) <= "01000100"; --O
+		memory(23) <= "00110001"; --N
+		memory(24) <= "01011010"; --Enter
+		wait for CLK_PERIOD*4;
+		reset <= '0';
+		wait;
+	end process;
+		
 CLK_STIMULUS : process
 	begin
-	for I in 0 to 100000 loop
 		clock <= not clock;
 		wait for CLK_PERIOD/2;
-    end loop;
 	end process;
 
-OTH_STIMULI : process
+RAM_STIMULI : process
 	begin
-		-- Reset
-		reset    <= '1';
-		wait for CLK_PERIOD * 3;
-		reset <= '0';
-
-
         wait until getchar = '1';
         wait for CLK_PERIOD * 3;
-        char <= "00100100"; --E
-
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "00100011"; --D
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "00101001"; --Space
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "00011110"; --1
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "00101001"; --Space
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "01000100"; --O
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "00110001"; --N
-        
-        wait until getchar = '1';
-        wait for CLK_PERIOD * 3;
-        char <= "01011010"; --Enter
-
-		--for i in 0 to 2 loop
+        char <= memory(i);
+        i <= (i+1) mod 480;
     end process;
 
 end architecture;

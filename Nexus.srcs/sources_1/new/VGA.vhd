@@ -105,6 +105,7 @@ architecture Behavioral of VGA is
 	signal red1				: std_logic_vector (3 downto 0);
 	signal green1			: std_logic_vector (3 downto 0);
 	signal blue1			: std_logic_vector (3 downto 0);
+	signal cond				: std_logic;
 begin
 
     ---------LOGIKA-----------------
@@ -115,7 +116,7 @@ begin
 	--Ko se enega bere se iz drugega piše
 	read1 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '0') else '0';
 	
-	
+	cond  <= '1' when row < 16 else '0';
 	
 	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov
 	offset <= offset0 or offset1;
@@ -163,7 +164,7 @@ begin
 		reset => reset,
 		read => read0,
 		write => read1,
-		debug => row(4),
+		debug => cond,
 		column => column,
 		row => row,
 		data => data,
@@ -180,7 +181,7 @@ begin
 		reset => reset,
 		read => read1,
 		write => read0,
-		debug => row(4),
+		debug => cond,
 		column => column,
 		row => row,
 		data => data,

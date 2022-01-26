@@ -107,7 +107,7 @@ architecture Behavioral of Nexus is
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
-	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := (others => '0');
+	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := (4 => '1', others => '0');
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
 

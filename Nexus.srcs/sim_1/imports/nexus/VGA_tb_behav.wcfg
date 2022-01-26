@@ -12,86 +12,82 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000000 ms"></ZoomStartTime>
-      <ZoomEndTime time="2,682.000000001 ms"></ZoomEndTime>
+      <ZoomEndTime time="63.500000001 ms"></ZoomEndTime>
       <Cursor1Time time="0.000000000 ms"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="272"></NameColumnWidth>
+      <NameColumnWidth column_width="248"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="17" />
-   <wvobject fp_name="/VGA_tb/clock" type="logic">
-      <obj_property name="ElementShortName">clock</obj_property>
-      <obj_property name="ObjectShortName">clock</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/reset" type="logic">
-      <obj_property name="ElementShortName">reset</obj_property>
-      <obj_property name="ObjectShortName">reset</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/char" type="array">
-      <obj_property name="ElementShortName">char[7:0]</obj_property>
-      <obj_property name="ObjectShortName">char[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/getchar" type="logic">
-      <obj_property name="ElementShortName">getchar</obj_property>
-      <obj_property name="ObjectShortName">getchar</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/CLK_PERIOD" type="other">
-      <obj_property name="ElementShortName">CLK_PERIOD</obj_property>
-      <obj_property name="ObjectShortName">CLK_PERIOD</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/hsync" type="logic">
-      <obj_property name="ElementShortName">hsync</obj_property>
-      <obj_property name="ObjectShortName">hsync</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/h_display" type="logic">
-      <obj_property name="ElementShortName">h_display</obj_property>
-      <obj_property name="ObjectShortName">h_display</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/vsync" type="logic">
-      <obj_property name="ElementShortName">vsync</obj_property>
-      <obj_property name="ObjectShortName">vsync</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/v_display" type="logic">
-      <obj_property name="ElementShortName">v_display</obj_property>
-      <obj_property name="ObjectShortName">v_display</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/row" type="array">
-      <obj_property name="ElementShortName">row[9:0]</obj_property>
-      <obj_property name="ObjectShortName">row[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/read0" type="logic">
-      <obj_property name="ElementShortName">read0</obj_property>
-      <obj_property name="ObjectShortName">read0</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/read1" type="logic">
-      <obj_property name="ElementShortName">read1</obj_property>
-      <obj_property name="ObjectShortName">read1</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/module_ASCII_to_px/addr_reg" type="array">
-      <obj_property name="ElementShortName">addr_reg[10:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_reg[10:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/data" type="array">
-      <obj_property name="ElementShortName">data[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/red[0]" type="logic">
+   <WVObjectSize size="2" />
+   <wvobject fp_name="group39" type="group">
+      <obj_property name="label">Main</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">red[0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/green[0]" type="logic">
+   <wvobject fp_name="group54" type="group">
+      <obj_property name="label">VGA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">green[0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/VGA_tb/UUT/blue[0]" type="logic">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">blue[0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/VGA_tb/clock" type="logic">
+         <obj_property name="ElementShortName">clock</obj_property>
+         <obj_property name="ObjectShortName">clock</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/reset" type="logic">
+         <obj_property name="ElementShortName">reset</obj_property>
+         <obj_property name="ObjectShortName">reset</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/getchar" type="logic">
+         <obj_property name="ElementShortName">getchar</obj_property>
+         <obj_property name="ObjectShortName">getchar</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/char" type="array">
+         <obj_property name="ElementShortName">char[7:0]</obj_property>
+         <obj_property name="ObjectShortName">char[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/ascii" type="array">
+         <obj_property name="ElementShortName">ascii[7:0]</obj_property>
+         <obj_property name="ObjectShortName">ascii[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/hsync" type="logic">
+         <obj_property name="ElementShortName">hsync</obj_property>
+         <obj_property name="ObjectShortName">hsync</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/h_display" type="logic">
+         <obj_property name="ElementShortName">h_display</obj_property>
+         <obj_property name="ObjectShortName">h_display</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/vsync" type="logic">
+         <obj_property name="ElementShortName">vsync</obj_property>
+         <obj_property name="ObjectShortName">vsync</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/v_display" type="logic">
+         <obj_property name="ElementShortName">v_display</obj_property>
+         <obj_property name="ObjectShortName">v_display</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/read0" type="logic">
+         <obj_property name="ElementShortName">read0</obj_property>
+         <obj_property name="ObjectShortName">read0</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/read1" type="logic">
+         <obj_property name="ElementShortName">read1</obj_property>
+         <obj_property name="ObjectShortName">read1</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/addr" type="array">
+         <obj_property name="ElementShortName">addr[10:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[10:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/red0[0]" type="logic">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/green0[0]" type="logic">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/VGA_tb/UUT/blue0[0]" type="logic">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
 </wave_config>

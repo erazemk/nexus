@@ -12,8 +12,8 @@ entity Executor is
 		data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
 		enable			: out std_logic; -- Signals that a new character should be sent to data
 		isready			: in std_logic;
-		led				: out std_logic_vector (15 downto 0); -- LEDs
-		anode			: out std_logic_vector (7 downto 0); -- 7-seg anode
+		led				: out std_logic_vector (15 downto 0) := (others => '1'); -- LEDs
+		anode			: out std_logic_vector (7 downto 0) := (others => '1'); -- 7-seg anode
 		cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
 		cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
 		cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1

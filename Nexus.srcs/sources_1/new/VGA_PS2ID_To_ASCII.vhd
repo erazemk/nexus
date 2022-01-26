@@ -45,11 +45,11 @@ begin
   begin
     case ps2id IS
  
-                WHEN x"29" => ascii <= x"20"; --space
-                WHEN x"66" => ascii <= x"08"; --backspace (BS control code)
-                WHEN x"0D" => ascii <= x"09"; --tab (HT control code)
-                WHEN x"5A" => ascii <= x"0D"; --enter (CR control code)
-                WHEN x"76" => ascii <= x"1B"; --escape (ESC control code)
+                --WHEN x"29" => ascii <= x"20"; --space
+                --WHEN x"66" => ascii <= x"08"; --backspace (BS control code)
+                --WHEN x"0D" => ascii <= x"09"; --tab (HT control code)
+                --WHEN x"5A" => ascii <= x"0D"; --enter (CR control code)
+                --WHEN x"76" => ascii <= x"1B"; --escape (ESC control code)
                 
                 WHEN x"1C" => ascii <= x"41"; --A
                 WHEN x"32" => ascii <= x"42"; --B

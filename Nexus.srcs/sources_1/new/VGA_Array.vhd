@@ -8,7 +8,6 @@ entity VGA_Array is
 		reset	    : in std_logic;
         read        : in std_logic;
         write       : in std_logic;
-        debug       : in std_logic;
         column	    : in unsigned (9 downto 0);
 		row 	    : in unsigned (9 downto 0);
 		data        : in std_logic_vector (0 to 7) := (others => '0');
@@ -44,20 +43,13 @@ process(clock)
             else
                 if read='1' then
                     if memory(to_integer(row(3 downto 0)))(to_integer(column)) = '1' then
-                        red <= "0000";
+                        red <= "1111";
                         green <= "1111";
-                        blue <= "0000";
+                        blue <= "1111";
                     else    
-                    case debug is
-                        when '1' =>
-                            red <= "1111";
-                            green <= "1111";
-                            blue <= "1111";
-                        when others =>
-                            red <= "0000";
-                            green <= "0000";
-                            blue <= "0000";
-                    end case;
+                        red <= "0000";
+                        green <= "0000";
+                        blue <= "0000";
                     end if;    
                     write_column <= 0;
                 elsif write = '1' and  write_column < 128 then  

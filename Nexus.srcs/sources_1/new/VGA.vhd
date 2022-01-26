@@ -63,7 +63,6 @@ architecture Behavioral of VGA is
 			reset		: in std_logic;
 			read		: in std_logic;
 			write       : in std_logic;
-			debug       : in std_logic;
 			column		: in unsigned (9 downto 0);
 			row			: in unsigned (9 downto 0);
 			data        : in std_logic_vector (0 to 7) := (others => '0');
@@ -116,7 +115,6 @@ begin
 	--Ko se enega bere se iz drugega piše
 	read1 <= '1' when (h_display = '1' and v_display = '1' and row(4) = '0') else '0';
 	
-	cond  <= '1' when row < 16 else '0';
 	
 	--ko enden array piše je drugi natavljen na 0, tako z or-om dobimo konstanten stream podatkov
 	offset <= offset0 or offset1;
@@ -164,7 +162,6 @@ begin
 		reset => reset,
 		read => read0,
 		write => read1,
-		debug => cond,
 		column => column,
 		row => row,
 		data => data,
@@ -181,7 +178,6 @@ begin
 		reset => reset,
 		read => read1,
 		write => read0,
-		debug => cond,
 		column => column,
 		row => row,
 		data => data,

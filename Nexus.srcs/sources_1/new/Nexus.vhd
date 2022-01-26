@@ -147,13 +147,26 @@ begin
 						SIG_KEYBOARD_F0 <= '0';
 					else
 						-- Check if the next char is a depressed previous one
-						if SIG_KEYBOARD_CHAR = "11110000" then -- char = 0xF0
+						if SIG_KEYBOARD_CHAR = "11110000" then -- char = 0xF0 (depress signal)
 							SIG_KEYBOARD_F0 <= '1';
 						else
-							SIG_BUFFER_WE <= "1";
-							SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-							SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
-							SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+							-- Check if char is enter
+							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
+								-- Round up to the nearest next multiple of 16 (to start at a new line)
+								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER / 16 + 1) * 16;
+							-- Or backspace
+							elsif SIG_KEYBOARD_CHAR = "01100110" then -- char = backspace
+								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER - 1;
+								SIG_BUFFER_WE <= "1";
+								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+								SIG_BUFFER_DIN <= (others => '0');
+							-- Normal character to be written to buffer
+							else
+								SIG_BUFFER_WE <= "1";
+								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+							end if;
 						end if;
 					end if;
 				elsif SIG_EXECUTOR_NEWCHAR = '1' then

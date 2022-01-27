@@ -124,6 +124,33 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
+	
+	-- Allowed character array
+	type char_array_type is array (0 to 21) of std_logic_vector(7 downto 0);
+	signal char_array : char_array_type := (
+			"01000101", -- 0
+			"00010110", -- 1
+			"00011110", -- 2
+			"00100110", -- 3
+			"00100101", -- 4
+			"00101110", -- 5
+			"00110110", -- 6
+			"00111101", -- 7
+			"00111110", -- 8
+			"01000110", -- 9
+			"00011100", -- A
+			"00110010", -- B
+			"00100001", -- C
+			"00100011", -- D
+			"00100100", -- E
+			"00101011", -- F
+			"00110100", -- G
+			"01001011", -- L
+			"00110001", -- N
+			"01000100", -- O
+			"00101101", -- R
+			"00011011"  -- S
+		);
 
 begin
 
@@ -162,12 +189,16 @@ begin
 								    SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
 								    SIG_BUFFER_DIN <= (others => '0');
 								end if;
-							-- Normal character to be written to buffer
 							else
-								SIG_BUFFER_WE <= "1";
-								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
-								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+								for i in 0 to char_array'length - 1 loop
+									-- Check if character is valid
+									if SIG_KEYBOARD_CHAR = char_array(i) then
+										SIG_BUFFER_WE <= "1";
+										SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+										SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+										SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+									end if;
+								end loop;
 							end if;
 						end if;
 					end if;

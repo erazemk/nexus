@@ -59,38 +59,84 @@ begin
 		wait for CLK_PERIOD/2;
 	end process;
 	
+	reset <= '1', '0' after CLK_PERIOD * 3;
+	enable <= '0', '1' after CLK_PERIOD * 4;
+
+	
 	OTH_STIMULI : process
+	variable idx : integer:= 0;
 	begin
 		-- Reset
-		reset    <= '1';
-		wait for CLK_PERIOD * 3;
-		reset <= '0';
-
-        enable <= '1';
-        symbol <= "01001011"; --L
-        isready <= '1';
-        wait for CLK_PERIOD * 3;
-        symbol <= "00100100"; --E
-        wait for CLK_PERIOD * 3;
-        symbol <= "00100011"; --D
-        wait for CLK_PERIOD * 3;
-        symbol <= "00101001"; --Space
-        wait for CLK_PERIOD * 3;
-        symbol <= "00011110"; --1
-        wait for CLK_PERIOD * 3;
-        symbol <= "00101001"; --Space
-        wait for CLK_PERIOD * 3;
-        symbol <= "01000100"; --O
-        wait for CLK_PERIOD * 3;
-        symbol <= "00110001"; --N
-        wait for CLK_PERIOD * 3;
-        symbol <= "01011010"; --Enter
-        wait for CLK_PERIOD * 3;
+		--reset    <= '1';
+		while (enable /= '1') loop
+		  wait for CLK_PERIOD;
+	    end loop;
+        
+        
+        while (enable = '1') loop
+            if (newchar = '1') then
+                case idx is
+                    when 0 =>
+                        symbol <= "01001011"; --L
+                    when 1 => 
+                        symbol <= "00100100"; --E
+                    when 2 => 
+                        symbol <= "00100011"; --D
+                    when 3 => 
+                        symbol <= "00101001"; --Space
+                    when 4 =>
+                        symbol <= "00011110"; --1
+                    when 5 => 
+                        symbol <= "00101001"; --Space
+                    when 6 => 
+                        symbol <= "01000100"; --O
+                    when 7 => 
+                        symbol <= "00110001"; --N
+                    when 8 => 
+                        symbol <= "01011010"; --Enter
+                    when others => symbol <= "00101001"; --Space
+                 end case;
+                 isready <= '1';
+                 if (newchar = '0') then
+                    isready <= '0';
+                 end if;
+                 idx := idx + 1;
+            end if;
+            wait for CLK_PERIOD;
+        end loop;
+        wait;
+        
+        -- if newchar = '1' then
+        --     symbol <= "01001011"; --L
+        --     isready <= '1';
+        -- end if;
+        
+        -- wait for CLK_PERIOD * 3;
+        -- if newchar = '1' then
+        --     symbol <= "00100100"; --E
+        --     isready <= '1';
+        -- end if;
+        
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "00100011"; --D
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "00101001"; --Space
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "00011110"; --1
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "00101001"; --Space
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "01000100"; --O
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "00110001"; --N
+        -- wait for CLK_PERIOD * 3;
+        -- symbol <= "01011010"; --Enter
+        -- wait for CLK_PERIOD * 3;
 		--for i in 0 to 2 loop
 			
 		--end loop;
 
-		wait; -- ?akaj neskon?no dolgo      
+		--wait; -- ?akaj neskon?no dolgo      
 	end process;
 
 

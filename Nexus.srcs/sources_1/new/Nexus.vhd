@@ -17,7 +17,7 @@ entity Nexus is
 		VGA_B	: out std_logic_vector (3 downto 0);
 
 		-- Executor I/O
-		LED		: out std_logic_vector (15 downto 0);
+		LED		: out std_logic_vector (15 downto 0) := (others => '1');
 		AN		: out std_logic_vector (7 downto 0);
 		CA		: out std_logic_vector (7 downto 0);
 		CLED0	: out std_logic_vector (2 downto 0);
@@ -181,7 +181,7 @@ begin
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
-							-- Or backspace
+							-- Or backspace TODO: Delete only last line
 							elsif SIG_KEYBOARD_CHAR = "01100110" then -- char = backspace
 								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER - 1;
 								if SIG_KEYBOARD_COUNTER > 0 then

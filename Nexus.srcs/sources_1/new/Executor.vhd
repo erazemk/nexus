@@ -11,8 +11,8 @@ entity Executor is
 		enter_confirm	: out std_logic;
 		data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
 		enable			: out std_logic; -- Signals that a new character should be sent to data
-		isready			: in std_logic;
-		led				: out std_logic_vector (15 downto 0) := (others => '1'); -- LEDs
+		isready			: in std_logic := '0';
+		led				: out std_logic_vector (15 downto 0); -- LEDs
 		anode			: out std_logic_vector (7 downto 0) := (others => '1'); -- 7-seg anode
 		cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
 		cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
@@ -63,19 +63,20 @@ architecture Behavioral of Executor is
 
 	component Executor_Parser is
 		Port ( 
-			clock	: in std_logic;
-			reset	: in std_logic;
-			symbol	: in std_logic_vector(7 downto 0);
-			enable	: in std_logic;
-			parsed	: inout std_logic;
-			command	: inout std_logic_vector(1 downto 0);
-			led_id	: out std_logic_vector(3 downto 0);
-			cled_id	: out std_logic;
-			seg_id	: out std_logic;
-			onoff	: out std_logic;
-			value	: out std_logic_vector(15 downto 0);
-			newchar	: out std_logic;
-			isready	: in std_logic
+			clock			: in std_logic;
+			reset			: in std_logic;
+			symbol			: in std_logic_vector(7 downto 0);
+			enable			: in std_logic;
+			parsed			: inout std_logic;
+			parsed_confirm	: in std_logic;
+			command			: inout std_logic_vector(1 downto 0);
+			led_id			: out std_logic_vector(3 downto 0);
+			cled_id			: out std_logic;
+			seg_id			: out std_logic;
+			onoff			: out std_logic;
+			value			: out std_logic_vector(15 downto 0);
+			newchar			: out std_logic;
+			isready			: in std_logic
 		);
 	end component;
 	
@@ -85,6 +86,7 @@ architecture Behavioral of Executor is
 	signal sig_command		: std_logic_vector(1 downto 0); -- 0 = LED, 1 = RGB LED, 2 = SEG
 	signal sig_id			: std_logic_vector(3 downto 0); -- ID of module element (e.g. LED with ID 1)
 	signal sig_value		: std_logic_vector(15 downto 0); -- Used for RGB LEDs and segments (e.g. CLED 1 R[ed] or SEG 1 BEEF)
+	signal parsed_confirm	: std_logic;
 	
 	-- LED signals
 	signal sig_led_enable	: std_logic;
@@ -108,7 +110,7 @@ begin
 
 	sig_rgb_color <= sig_value(1 downto 0);
 
-	GET_CHAR : process(clock)
+	GET_CHAR : process(clock, enter, sig_parsed, sig_command)
 	begin
 		if rising_edge(clock) then
 		
@@ -118,10 +120,15 @@ begin
 			if enter = '0' then
 				enter_confirm <= '0';
 			end if;
+			
+			-- Reset parsed confirmation
+			if sig_parsed = '0' then
+				parsed_confirm <= '0';
+			end if;
 
 			if sig_parsed = '1' then
 				enter_confirm <= '1';
-				sig_parsed <= '0';
+				parsed_confirm <= '1'; -- Set parsed confirmation
 				
 				case sig_command is
 					when "00" => sig_led_enable <= '1';
@@ -184,6 +191,7 @@ begin
 		symbol => data,
 		enable => enter,
 		parsed => sig_parsed,
+		parsed_confirm => parsed_confirm,
 		command => sig_command,
 		led_id => sig_led_id,
 		cled_id => sig_rgb_id,

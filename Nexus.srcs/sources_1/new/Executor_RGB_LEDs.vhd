@@ -23,7 +23,7 @@ architecture Behavioral of Executor_RGB_LEDs is
 
 begin
 
-	process(clock, enable, reset)
+	process(clock, enable, reset, state)
 	begin
 		
 		if rising_edge(clock) then

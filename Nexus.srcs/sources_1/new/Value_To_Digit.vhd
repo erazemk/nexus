@@ -16,7 +16,7 @@ architecture Behavioral of Value_To_Digit is
 
 begin
 
-	process (value, anode)
+	process (anode)
 	begin
 
 		case anode is

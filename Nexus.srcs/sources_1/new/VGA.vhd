@@ -64,7 +64,7 @@ architecture Behavioral of VGA is
 			read		: in std_logic;
 			write       : in std_logic;
 			column		: in unsigned (9 downto 0);
-			row			: in unsigned (9 downto 0);
+			row			: in unsigned (9 downto 0) := (others => '0');
 			data        : in std_logic_vector (0 to 7) := (others => '0');
 		    offset      : out std_logic_vector (3 downto 0) := (others => '0');
 			getchar		: out std_logic;

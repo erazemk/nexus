@@ -63,8 +63,14 @@ architecture Behavioral of Executor_7_Segment_Display is
 
 begin
 
-	sig_enable <= enable;
-	anode <= sig_anode;
+	process(enable, sig_anode)
+	begin
+		if enable = '1' then
+			anode <= sig_anode;
+		else
+			anode <= (others => '1');
+		end if;
+	end process;
 
 	module_prescaler: Prescaler
 	generic map (

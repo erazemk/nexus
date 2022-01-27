@@ -21,7 +21,7 @@ architecture Behavioral of Anode_Switcher is
 
 begin
 
-	process(reset, clock, enable)
+	process(reset, clock, enable, state1, state2)
 	begin
 
 		if reset = '1' then

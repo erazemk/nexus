@@ -3,19 +3,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity Executor_Parser is
 	Port ( 
-		clock	: in std_logic;
-		reset	: in std_logic;
-		symbol	: in std_logic_vector(7 downto 0);
-		enable	: in std_logic;
-		parsed	: inout std_logic;
-		command	: inout std_logic_vector(1 downto 0);
-		led_id	: out std_logic_vector(3 downto 0);
-		cled_id	: out std_logic;
-		seg_id	: out std_logic;
-		onoff	: out std_logic;
-		value	: out std_logic_vector(15 downto 0);
-		newchar : out std_logic;
-		isready	: in std_logic
+		clock			: in std_logic;
+		reset			: in std_logic;
+		symbol			: in std_logic_vector(7 downto 0);
+		enable			: in std_logic;
+		parsed			: inout std_logic;
+		parsed_confirm	: in std_logic;
+		command			: inout std_logic_vector(1 downto 0);
+		led_id			: out std_logic_vector(3 downto 0);
+		cled_id			: out std_logic;
+		seg_id			: out std_logic;
+		onoff			: out std_logic;
+		value			: out std_logic_vector(15 downto 0);
+		newchar 		: out std_logic;
+		isready			: in std_logic
 	);
 end entity;
 
@@ -28,11 +29,15 @@ architecture Behavioral of Executor_Parser is
 
 begin
 
-	process(clock, reset, state, next_space, enable, skip, isready, symbol, first_o, command)
+	process(clock, reset, state, next_space, enable, skip, isready, symbol, first_o, command, parsed_confirm, saved_symbol)
 		variable val : std_logic_vector(3 downto 0);
 	begin
 	
 		if rising_edge(clock) then
+		
+			if parsed_confirm = '1' then
+				parsed <= '0';
+			end if;
 		
 			if reset = '1' then
 				state <= S_IDLE;

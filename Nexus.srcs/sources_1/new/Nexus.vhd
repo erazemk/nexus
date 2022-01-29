@@ -76,19 +76,16 @@ architecture Behavioral of Nexus is
 	
 	component Code_Buffer is
 		Port (
-			clka		: IN STD_LOGIC;
-			rsta		: IN STD_LOGIC;
-			wea			: IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-			addra		: IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-			dina		: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-			douta		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			clkb		: IN STD_LOGIC;
-			web			: IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-			addrb		: IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-			dinb		: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-			doutb		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			rsta_busy	: OUT STD_LOGIC;
-			rstb_busy	: OUT STD_LOGIC
+			clka	: in std_logic;
+			wea		: in std_logic_vector(0 downto 0);
+			addra	: in std_logic_vector(8 downto 0);
+			dina	: in std_logic_vector(7 downto 0);
+			douta	: out std_logic_vector(7 downto 0);
+			clkb	: in std_logic;
+			web		: in std_logic_vector(0 downto 0);
+			addrb	: in std_logic_vector(8 downto 0);
+			dinb	: in std_logic_vector(7 downto 0);
+			doutb	: out std_logic_vector(7 downto 0)
 		);
 	end component;
 	
@@ -102,8 +99,6 @@ architecture Behavioral of Nexus is
 	signal SIG_BUFFER_DIN		: std_logic_vector(7 downto 0);
 	signal SIG_BUFFER_DATA_A	: std_logic_vector(7 downto 0);
 	signal SIG_BUFFER_DATA_B	: std_logic_vector(7 downto 0);
-	signal SIG_BUFFER_RESET		: std_logic;
-	signal SIG_BUFFER_BUSY_A	: std_logic;
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
@@ -157,18 +152,15 @@ begin
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	main_proc: process(CLOCK, SIG_RESET, SIG_BUFFER_BUSY_A, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR, SIG_KEYBOARD_CONFIRM)
+	main_proc: process(CLOCK, SIG_RESET, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR, SIG_KEYBOARD_CONFIRM)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_KEYBOARD_COUNTER <= (others => '0');
 				SIG_EXECUTOR_COUNTER <= (others => '0');
-				SIG_BUFFER_RESET <= '1';
-			elsif SIG_BUFFER_BUSY_A = '0' then
-				if SIG_KEYBOARD_COUNTER = 480 then
-					SIG_BUFFER_RESET <= '1';
+			else
 				-- Keyboard has sent new character
-				elsif SIG_KEYBOARD_EOT = '1' then
+				if SIG_KEYBOARD_EOT = '1' then
 					-- Previous character was F0 (key was depressed)
 					if SIG_KEYBOARD_F0 = '1' then
 						SIG_KEYBOARD_F0 <= '0';
@@ -184,7 +176,8 @@ begin
 							-- Or backspace TODO: Delete only last line
 							elsif SIG_KEYBOARD_CHAR = "01100110" then -- char = backspace
 								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER - 1;
-								if SIG_KEYBOARD_COUNTER > 0 then
+								-- Only allow deleting last line
+								if SIG_KEYBOARD_COUNTER > 0 then -- TODO: 0 should be closest lower multiple of 16 
 								    SIG_BUFFER_WE <= "1";
 								    SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
 								    SIG_BUFFER_DIN <= (others => '0');
@@ -221,8 +214,6 @@ begin
 					end if;
 				end if;
 			end if;
-			
-			SIG_BUFFER_RESET <= '0';
 		end if;
 	end process;
 	
@@ -293,7 +284,6 @@ begin
 	module_buffer: Code_Buffer
 	port map (
 		clka => CLOCK,
-		rsta => SIG_BUFFER_RESET,
 		wea => SIG_BUFFER_WE,
 		addra => SIG_BUFFER_ADDR_A,
 		dina => SIG_BUFFER_DIN,
@@ -302,9 +292,7 @@ begin
 		web => (others => '0'),
 		addrb => SIG_BUFFER_ADDR_B,
 		dinb => (others => '0'),
-		doutb => SIG_BUFFER_DATA_B,
-		rsta_busy => SIG_BUFFER_BUSY_A,
-		rstb_busy => open
+		doutb => SIG_BUFFER_DATA_B
 	);
 
 end architecture;

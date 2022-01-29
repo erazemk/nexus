@@ -17,7 +17,7 @@ entity Nexus is
 		VGA_B	: out std_logic_vector (3 downto 0);
 
 		-- Executor I/O
-		LED		: out std_logic_vector (15 downto 0) := (others => '1');
+		LED		: out std_logic_vector (15 downto 0) := (others => '0');
 		AN		: out std_logic_vector (7 downto 0);
 		CA		: out std_logic_vector (7 downto 0);
 		CLED0	: out std_logic_vector (2 downto 0);

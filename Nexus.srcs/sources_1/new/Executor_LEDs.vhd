@@ -27,7 +27,7 @@ begin
 				led <= (others => '1');
 			elsif enable = '1' then
 				-- 'not state' because LED == off when state == 1
-				led(to_integer(unsigned(id))) <= not state;
+				led(to_integer(unsigned(id))) <= state;
 			end if;
 		end if;
 	

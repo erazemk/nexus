@@ -9,23 +9,24 @@ end Executor_Parser_tb;
 architecture Behavioral of Executor_Parser_tb is
     component Executor_Parser is
 	Port ( 
-		clock	: in std_logic;
-		reset	: in std_logic;
-		symbol	: in std_logic_vector(7 downto 0);
-		enable	: in std_logic;
-		parsed	: inout std_logic;
-		command	: inout std_logic_vector(1 downto 0);
-		led_id	: out std_logic_vector(3 downto 0);
-		cled_id	: out std_logic;
-		seg_id	: out std_logic;
-		onoff	: out std_logic;
-		value	: out std_logic_vector(15 downto 0);
-		newchar : out std_logic;
-		isready	: in std_logic
+		clock	        : in std_logic;
+		reset	        : in std_logic;
+		symbol	        : in std_logic_vector(7 downto 0);
+		enable	        : in std_logic;
+		parsed	        : inout std_logic;
+		parsed_confirm	: in std_logic;
+		command	        : inout std_logic_vector(1 downto 0);
+		led_id	        : out std_logic_vector(3 downto 0);
+		cled_id	        : out std_logic;
+		seg_id	        : out std_logic;
+		onoff	        : out std_logic;
+		value	        : out std_logic_vector(15 downto 0);
+		newchar         : out std_logic;
+		isready	        : in std_logic
 	);
 end component;
 
-signal clock, reset, enable, parsed, isready : std_logic := '0';
+signal clock, reset, enable, parsed, isready, parsed_confirm : std_logic := '0';
 signal symbol : std_logic_vector(7 downto 0) := "00000000";
 
 signal cled_id, seg_id, onoff, newchar: std_logic;
@@ -43,6 +44,7 @@ begin
 			symbol	=> symbol,
 			enable	=> enable,
 			parsed	=> parsed,
+			parsed_confirm => parsed_confirm,
 			command	=> command,
 			led_id  => led_id, 
 			cled_id	=> cled_id,
@@ -97,10 +99,11 @@ begin
                     when others => symbol <= "00101001"; --Space
                  end case;
                  isready <= '1';
-                 if (newchar = '0') then
-                    isready <= '0';
-                 end if;
+                 
                  idx := idx + 1;
+            end if;
+            if (newchar = '0') then
+                    isready <= '0';
             end if;
             wait for CLK_PERIOD;
         end loop;

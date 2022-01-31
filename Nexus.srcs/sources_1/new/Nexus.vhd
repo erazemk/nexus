@@ -102,7 +102,7 @@ architecture Behavioral of Nexus is
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
-	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := "000010000";
+	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := "000010001";
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
 
@@ -174,15 +174,12 @@ begin
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
-							-- Or backspace TODO: Delete only last line
-							elsif SIG_KEYBOARD_CHAR = "01100110" then -- char = backspace
+							-- Or backspace, only allow deleting last line
+							elsif SIG_KEYBOARD_CHAR = "01100110" and SIG_KEYBOARD_COUNTER(3 downto 0) > 0 then -- char = backspace   
+								SIG_BUFFER_WE <= "1";
+								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
 								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER - 1;
-								-- Only allow deleting last line
-								if SIG_KEYBOARD_COUNTER > 0 then -- TODO: 0 should be closest lower multiple of 16 
-								    SIG_BUFFER_WE <= "1";
-								    SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-								    SIG_BUFFER_DIN <= (others => '0');
-								end if;
+								SIG_BUFFER_DIN <= (others => '0');
 							else
 								for i in 0 to char_array'length - 1 loop
 									-- Check if character is valid
@@ -204,8 +201,7 @@ begin
 					SIG_EXECUTOR_READY <= '1';
 				else
 					SIG_EXECUTOR_READY <= '0';
-					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER - 1);
-					
+										
 					if SIG_BUFFER_DATA_A = "01011010" then
 						SIG_KEYBOARD_ENTER <= '1';
 					end if;
@@ -223,22 +219,22 @@ begin
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
-				SIG_VGA_COUNTER <= "000010000";
-			elsif SIG_VGA_NEWCHAR = '0' then
-				SIG_VGA_PREVCHAR <= '0';
+				SIG_VGA_COUNTER <= "000010001";
+			--elsif SIG_VGA_NEWCHAR = '0' then
+				--SIG_VGA_PREVCHAR <= '0';
 			-- If a new character has been requested
-			elsif SIG_VGA_NEWCHAR = '1' and SIG_VGA_PREVCHAR = '0' then
+			elsif SIG_VGA_NEWCHAR = '1' then --and SIG_VGA_PREVCHAR = '0' then
 				-- Start re-reading from code buffer
 				if (SIG_VGA_COUNTER = "111011111") then
 					SIG_VGA_COUNTER <= (others => '0');
 			    else
 			       SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
 				end if;
-		
+				
 				SIG_BUFFER_ADDR_B <= std_logic_vector(SIG_VGA_COUNTER);
 				SIG_VGA_CHAR <= SIG_BUFFER_DATA_B;
 				
-				SIG_VGA_PREVCHAR <= '1';
+				--SIG_VGA_PREVCHAR <= '1';
 			end if;
 		end if;
 	end process;

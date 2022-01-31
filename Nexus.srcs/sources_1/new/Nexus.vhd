@@ -102,7 +102,7 @@ architecture Behavioral of Nexus is
 
 	-- VGA signals
 	signal SIG_VGA_CHAR			: std_logic_vector (7 downto 0);
-	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := "000010001";
+	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := "000010000";
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
 
@@ -121,7 +121,7 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
 	
 	-- Allowed character array
-	type char_array_type is array (0 to 21) of std_logic_vector(7 downto 0);
+	type char_array_type is array (0 to 22) of std_logic_vector(7 downto 0);
 	signal char_array : char_array_type := (
 			"01000101", -- 0
 			"00010110", -- 1
@@ -144,7 +144,8 @@ architecture Behavioral of Nexus is
 			"00110001", -- N
 			"01000100", -- O
 			"00101101", -- R
-			"00011011"  -- S
+			"00011011", -- S
+			"00101001"  -- Space
 		);
 
 begin
@@ -222,7 +223,7 @@ begin
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
-				SIG_VGA_COUNTER <= "000010001";
+				SIG_VGA_COUNTER <= "000010000";
 			elsif SIG_VGA_NEWCHAR = '0' then
 				SIG_VGA_PREVCHAR <= '0';
 			-- If a new character has been requested

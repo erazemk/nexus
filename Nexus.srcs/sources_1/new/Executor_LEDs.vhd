@@ -24,7 +24,7 @@ begin
 
 		if rising_edge(clock) then
 			if reset = '1' then
-				led <= (others => '1');
+				led <= (others => '0');
 			elsif enable = '1' then
 				-- 'not state' because LED == off when state == 1
 				led(to_integer(unsigned(id))) <= state;

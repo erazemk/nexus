@@ -174,6 +174,7 @@ begin
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
+								SIG_KEYBOARD_ENTER <= '1';
 							-- Or backspace, only allow deleting last line
 							elsif SIG_KEYBOARD_CHAR = "01100110" and SIG_KEYBOARD_COUNTER(3 downto 0) > 0 then -- char = backspace   
 								SIG_BUFFER_WE <= "1";
@@ -201,13 +202,10 @@ begin
 					SIG_EXECUTOR_READY <= '1';
 				else
 					SIG_EXECUTOR_READY <= '0';
-										
-					if SIG_BUFFER_DATA_A = "01011010" then
-						SIG_KEYBOARD_ENTER <= '1';
-					end if;
-					
+
 					if SIG_KEYBOARD_CONFIRM = '1' then
 						SIG_KEYBOARD_ENTER <= '0';
+						SIG_EXECUTOR_COUNTER <= SIG_KEYBOARD_COUNTER;
 					end if;
 				end if;
 			end if;
@@ -220,21 +218,17 @@ begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_VGA_COUNTER <= "000010001";
-			--elsif SIG_VGA_NEWCHAR = '0' then
-				--SIG_VGA_PREVCHAR <= '0';
 			-- If a new character has been requested
-			elsif SIG_VGA_NEWCHAR = '1' then --and SIG_VGA_PREVCHAR = '0' then
+			elsif SIG_VGA_NEWCHAR = '1' then
 				-- Start re-reading from code buffer
 				if (SIG_VGA_COUNTER = "111011111") then
 					SIG_VGA_COUNTER <= (others => '0');
-			    else
-			       SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
+				else
+					SIG_VGA_COUNTER <= SIG_VGA_COUNTER + 1;
 				end if;
-				
+
 				SIG_BUFFER_ADDR_B <= std_logic_vector(SIG_VGA_COUNTER);
 				SIG_VGA_CHAR <= SIG_BUFFER_DATA_B;
-				
-				--SIG_VGA_PREVCHAR <= '1';
 			end if;
 		end if;
 	end process;

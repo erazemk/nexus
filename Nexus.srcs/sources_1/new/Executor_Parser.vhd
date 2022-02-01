@@ -30,6 +30,7 @@ architecture Behavioral of Executor_Parser is
 	signal command_is_set				: std_logic := '0';
 	signal id_is_set					: std_logic := '0';
 	signal onoff_is_set					: std_logic := '0';
+	signal skip_is_set					: std_logic := '0';
 	signal value1_is_set				: std_logic := '0';
 	signal value2_is_set				: std_logic := '0';
 	signal value3_is_set				: std_logic := '0';
@@ -44,6 +45,8 @@ begin
 				state <= S_IDLE;
 				parsed <= '0';
 				first_o <= '0';
+			elsif parsed_confirm = '1' then
+			     parsed <= '0';
 			elsif isready = '1' and enable = '1' then
 				--state <= next_state;
 				newchar <= '0';
@@ -98,15 +101,15 @@ begin
 					next_state <= S_COMMAND;
 				end if;
 			when S_COMMAND =>
-				if pulse = '1' then
+				if pulse = '1' and command_is_set = '1' then
 					next_state <= S_SKIP;
 				end if;
 			when S_ID =>
-				if pulse = '1' then
+				if pulse = '1' and id_is_set = '1' then
 					next_state <= S_ONOFF;
 				end if;
 			when S_ONOFF =>
-				if pulse = '1' then
+				if pulse = '1' and onoff_is_set = '1' then
 					if symbol = "00101001" then -- Space
 						next_state <= S_VALUE1;
 					elsif symbol = "01011010" then -- Enter
@@ -114,36 +117,37 @@ begin
 					end if;
 				end if;
 			when S_SKIP =>
-				if pulse = '1' and symbol = "00101001" then -- Space
+				if pulse = '1' and skip_is_set = '1' then -- Space
 					next_state <= S_ID;
 				end if;
 			when S_VALUE1 =>
-				if pulse = '1' then
+				if pulse = '1' and value1_is_set = '1' then
 					next_state <= S_VALUE2;
 				end if;
 			when S_VALUE2 =>
-				if pulse = '1' then
+				if pulse = '1' and value2_is_set = '1' then
 					next_state <= S_VALUE3;
 				end if;
 			when S_VALUE3 =>
-				if pulse = '1' then
+				if pulse = '1' and value3_is_set = '1' then
 					next_state <= S_VALUE4;
 				end if;
 			when S_VALUE4 =>
-				if pulse = '1' then
+				if pulse = '1' and value4_is_set = '1' then
 					next_state <= S_IDLE;
 				end if;
-			when others => sig_error <= '1';
+			when others => next_state <= S_IDLE;
 		end case;
 	end process;
 	
-	OUTPUT : process(state, symbol, pulse, command_is_set, command)
+	OUTPUT : process(state, symbol, pulse, command_is_set, command,enable)
 	begin
 		case state is 
 			when S_IDLE =>
 				if enable = '1' then
 					command_is_set <= '0';
 					id_is_set <= '0';
+					skip_is_set <= '0';
 					onoff_is_set <= '0';
 					value1_is_set <= '0';
 					value2_is_set <= '0';
@@ -151,6 +155,9 @@ begin
 					value4_is_set <= '0';
 				end if;
 			when S_SKIP =>
+			    if symbol = "00101001" then -- space
+			        skip_is_set <= '1';
+			    end if;
 			when S_COMMAND =>
 				if pulse = '1' then
 					if command_is_set <= '0' and symbol = "01001011" then -- L

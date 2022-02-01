@@ -142,6 +142,9 @@ begin
 			-- Reset parsed confirmation
 			if sig_parsed = '0' then
 				parsed_confirm <= '0';
+				sig_led_enable <= '0';
+				sig_rgb_enable <= '0';
+				sig_seg_enable <= '0';
 			end if;
 
 			if sig_parsed = '1' then

@@ -152,31 +152,31 @@ begin
 
 		enter <= '0';
 		
---		wait for CLK_PERIOD * 5;
+		wait for CLK_PERIOD * 5;
 		
---		enter <= '1';
+		enter <= '1';
 		
---				for i in 0 to 8 loop
---			-- enable == newchar in parser
---			while (enable /= '1') loop
---				wait for CLK_PERIOD;
---			end loop;
+				for i in 0 to 8 loop
+			-- enable == newchar in parser
+			while (enable /= '1') loop
+				wait for CLK_PERIOD;
+			end loop;
 
---			data <= arr4(i);
---			isready <= '1';
+			data <= arr4(i);
+			isready <= '1';
 
---			while (enable /= '0') loop
---				wait for CLK_PERIOD;
---			end loop;
+			while (enable /= '0') loop
+				wait for CLK_PERIOD;
+			end loop;
 
---			isready <= '0';
---		end loop;
+			isready <= '0';
+		end loop;
 		
---		while (enter_confirm /= '1') loop
---			wait for CLK_PERIOD;
---		end loop;
+		while (enter_confirm /= '1') loop
+			wait for CLK_PERIOD;
+		end loop;
 		
---		enter <= '0';
+		enter <= '0';
 		wait for CLK_PERIOD * 5;
     end process;
 end architecture;

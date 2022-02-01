@@ -47,6 +47,7 @@ begin
 				first_o <= '0';
 			elsif parsed_confirm = '1' then
 			     parsed <= '0';
+			     newchar <= '1';
 			elsif isready = '1' and enable = '1' then
 				--state <= next_state;
 				newchar <= '0';

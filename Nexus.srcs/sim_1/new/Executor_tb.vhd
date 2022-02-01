@@ -51,6 +51,20 @@ architecture Behavioral of Executor_tb is
 		"01011010"  -- Enter
 	);
 	
+	type arr_type5 is array (0 to 9) of std_logic_vector(7 downto 0);
+	signal arr5 : arr_type5 := (
+		"01001011", -- L
+		"00100100", -- E
+		"00100011", -- D
+		"00101001", -- Space
+		"00111110", -- 8
+		"00101001", -- Space
+		"01000100", -- O
+		"00101011", -- F
+		"00101011", -- F
+		"01011010"  -- Enter
+	);
+	
 	type arr_type4 is array (0 to 8) of std_logic_vector(7 downto 0);
 	signal arr4 : arr_type4 := (
 		"01001011", -- L
@@ -178,5 +192,31 @@ begin
 		
 		enter <= '0';
 		wait for CLK_PERIOD * 5;
+		
+		enter <= '1';
+		
+		for i in 0 to 9 loop
+			-- enable == newchar in parser
+			while (enable /= '1') loop
+				wait for CLK_PERIOD;
+			end loop;
+
+			data <= arr5(i); 
+			isready <= '1';
+
+			while (enable /= '0') loop
+				wait for CLK_PERIOD;
+			end loop;
+
+			isready <= '0';
+		end loop;
+		
+		while (enter_confirm /= '1') loop
+			wait for CLK_PERIOD;
+		end loop;
+		
+		enter <= '0';
+    wait;
     end process;
+    
 end architecture;

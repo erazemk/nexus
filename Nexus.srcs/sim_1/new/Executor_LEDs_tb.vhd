@@ -45,21 +45,15 @@ begin
 	
 	OTH_STIMULI : process
 	begin
-		-- Reset
-		reset    <= '1';
-		wait for CLK_PERIOD * 3;
-		reset <= '0';
-
-		for i in 0 to 2 loop
-			-- Mirovanje 
-			enable <= '1';
-			wait for CLK_PERIOD;
-			state <= '1';
-			id <= "0001";
-
-		end loop;
-
-		wait; -- cakaj neskoncno dolgo      
+		state <= '1';
+		id <= "0101";
+		wait for CLK_PERIOD;
+		enable <= '1';
+		
+		wait for CLK_PERIOD;
+		enable <= '0';
+		
+		wait for CLK_PERIOD * 5;
 	end process;
 
 end architecture;

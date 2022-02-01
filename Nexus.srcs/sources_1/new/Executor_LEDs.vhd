@@ -10,7 +10,7 @@ entity Executor_LEDs is
 		enable	: in std_logic; -- Signals when to write to an LED
 		state	: in std_logic; -- Whether LED should be on (1) or off (0)
 		id		: in std_logic_vector (3 downto 0); -- LED to write to
-		led		: out std_logic_vector (15 downto 0) -- Array of LEDs
+		led		: out std_logic_vector (15 downto 0) := (others => '0') -- Array of LEDs
 	);
 
 end entity;

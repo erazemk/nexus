@@ -28,6 +28,7 @@ architecture Behavioral of Executor_Parser is
 	signal saved_symbol                 : std_logic_vector(7 downto 0);
 	signal newchar_delay				: std_logic;
 	signal sig_error					: std_logic;
+	signal command_is_set				: std_logic := '0';
 
 begin
 
@@ -71,6 +72,7 @@ begin
 				--TODO pomni izhod 	pulse <= output;
 				elsif saved_symbol = "01011010" then --Enter oz konec ukaza
 					parsed <= '1';
+					command_is_set <= '0';
 					next_state <= S_IDLE;
 				end if;
 			
@@ -129,13 +131,25 @@ begin
 						-- newchar_delay <= '1';
 					when S_COMMAND =>
 						if saved_symbol = "01001011" then -- saved_symbol = L
-							command <= "00";
+							if command_is_set <= '0' then
+								command <= "00";
+								command_is_set <= '1';
+							end if;
+
 							skip <= '1';
 						elsif saved_symbol = "00100001" then -- saved_symbol = C
-							command <= "01";
+							if command_is_set <= '0' then
+								command <= "01";
+								command_is_set <= '1';
+							end if;
+
 							skip <= '1';
 						elsif saved_symbol = "00011011" then --saved_symbol = S
-							command <= "10";
+							if command_is_set <= '0' then
+								command <= "10";
+								command_is_set <= '1';
+							end if;
+
 							skip <= '1';
 						end if;
 						-- newchar_delay <= '1';

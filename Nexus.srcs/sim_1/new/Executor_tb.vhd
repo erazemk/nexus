@@ -50,6 +50,19 @@ architecture Behavioral of Executor_tb is
 		"00110001", -- N
 		"01011010"  -- Enter
 	);
+	
+	type arr_type4 is array (0 to 8) of std_logic_vector(7 downto 0);
+	signal arr4 : arr_type4 := (
+		"01001011", -- L
+		"00100100", -- E
+		"00100011", -- D
+		"00101001", -- Space
+		"00010110", -- 1
+		"00101001", -- Space
+		"01000100", -- O
+		"00110001", -- N
+		"01011010"  -- Enter
+	);
 
 	type arr_type2 is array (0 to 11) of std_logic_vector(7 downto 0);
 	signal arr2 : arr_type2 := (
@@ -67,7 +80,23 @@ architecture Behavioral of Executor_tb is
 		"01011010"  -- Enter
 	);
 	
-
+	type arr_type3 is array (0 to 13) of std_logic_vector(7 downto 0);
+	signal arr3 : arr_type3 := (
+		"00011011", -- S
+		"00100100", -- E
+		"00110100", -- G
+		"00101001", -- Space
+		"00010110", -- 1
+		"00101001", -- Space
+		"01000100", -- O
+		"00110001", -- N
+		"00101001", -- Space
+		"00110010", -- B
+		"00100100", -- E
+		"00100100", -- E
+		"00101011", -- F
+		"01011010"  -- Enter
+	);
 
 begin
 
@@ -97,15 +126,17 @@ begin
 	
 	OTH_STIMULI : process
 	begin
+		wait for CLK_PERIOD * 5;
+	
 		enter <= '1';
 
-		for i in 0 to 11 loop
+		for i in 0 to 8 loop
 			-- enable == newchar in parser
 			while (enable /= '1') loop
 				wait for CLK_PERIOD;
 			end loop;
 
-			data <= arr2(i);
+			data <= arr(i);
 			isready <= '1';
 
 			while (enable /= '0') loop
@@ -120,7 +151,32 @@ begin
 		end loop;
 
 		enter <= '0';
+		
+--		wait for CLK_PERIOD * 5;
+		
+--		enter <= '1';
+		
+--				for i in 0 to 8 loop
+--			-- enable == newchar in parser
+--			while (enable /= '1') loop
+--				wait for CLK_PERIOD;
+--			end loop;
 
-		wait;
+--			data <= arr4(i);
+--			isready <= '1';
+
+--			while (enable /= '0') loop
+--				wait for CLK_PERIOD;
+--			end loop;
+
+--			isready <= '0';
+--		end loop;
+		
+--		while (enter_confirm /= '1') loop
+--			wait for CLK_PERIOD;
+--		end loop;
+		
+--		enter <= '0';
+		wait for CLK_PERIOD * 5;
     end process;
 end architecture;

@@ -34,11 +34,14 @@ architecture Behavioral of Nexus_tb is
     end component;
 
 
-	-- Vhodni signali, ki UUT povezujejo z generatorjem dra�ljajev
-	signal CLOCK, RESET     : std_logic := '0';
-	signal KCLK, KDATA  : std_logic := '1';
-	signal VGA_HS, VGA_VS : std_logic;
-    signal  VGA_R, VGA_G, VGA_B  :std_logic_vector(3 downto 0);
+	-- Vhodni signali, ki UUT povezujejo z generatorjem drazljajev
+	signal CLOCK, RESET     	: std_logic := '0';
+	signal KCLK, KDATA  		: std_logic := '1';
+	signal VGA_HS, VGA_VS 		: std_logic;
+    signal VGA_R, VGA_G, VGA_B  : std_logic_vector(3 downto 0);
+	signal LED  				: std_logic_vector (15 downto 0);
+	signal AN, CA 				: std_logic_vector (7 downto 0);	
+	signal CLED0, CLED1 		: std_logic_vector (2 downto 0);
 
 	-- Konstante
 	constant CLK_PERIOD : time                          := 10 ns;
@@ -46,14 +49,23 @@ architecture Behavioral of Nexus_tb is
 	-- Podatke pisemo v smeri, ki je obratna, kot ce bi jih pisali glede na cas.
 	-- STOP PAR B7...... B0 START
 	--  1    0  0101 1010     0 "10 01011010 0" 
-	type memory_type is array (0 to 17) of std_logic_vector(10 downto 0);
-    signal SIM_DATA      : memory_type := (others => (others => '0'));
-    
+	type char_arr_type is array (0 to 8) of std_logic_vector(7 downto 0);
+	signal char_arr : char_arr_type := (
+		"01001011", -- L
+		"00100100", -- E
+		"00100011", -- D
+		"00101001", -- Space
+		"00111110", -- 8
+		"00101001", -- Space
+		"01000100", -- O
+		"00110001", -- N
+		"01011010"  -- Enter
+	);
 
 begin
 
 	UUT : Nexus
-	port map(
+	port map (
 		CLOCK => CLOCK,
 		RESET => RESET,
         KCLK => KCLK,
@@ -66,38 +78,13 @@ begin
 		VGA_B => VGA_B,
 
 		-- Executor O
-		LED => open,
-		AN => open,
-		CA => open,
-		CLED0 => open,
-		CLED1 => open
+		LED => LED,
+		AN => AN,
+		CA => CA,
+		CLED0 => CLED0,
+		CLED1 => CLED1
 	);
-INIT : process
-	begin
-		reset <= '1';
-		SIM_DATA(0) <= "10010010110"; --L
-		SIM_DATA(1) <= "10001001000"; --E
-		SIM_DATA(2) <= "10001000110"; --D
-		SIM_DATA(3) <= "10001010010"; --Space
-		SIM_DATA(4) <= "10000111100"; --1
-		SIM_DATA(5) <= "10001010010"; --Space
-		SIM_DATA(6) <= "10010001000"; --O
-		SIM_DATA(7) <= "10001100010"; --N
-		SIM_DATA(8) <= "10010110100"; --Enter
-		--New Line
-		SIM_DATA(9) <= "10010010110"; --L
-		SIM_DATA(10) <= "10001001000"; --E
-		SIM_DATA(11) <= "10001000110"; --D
-		SIM_DATA(12) <= "10001010010"; --Space
-		SIM_DATA(13) <= "10000111100"; --1
-		SIM_DATA(14) <= "10001010010"; --Space
-		SIM_DATA(15) <= "10010001000"; --O
-		SIM_DATA(16) <= "10001100010"; --N
-		SIM_DATA(17) <= "10010110100"; --Enter
-		wait for CLK_PERIOD*4;
-		reset <= '0';
-		wait;
-	end process;
+
 	-- Ura 
 	CLK_STIMULUS : process
 	begin
@@ -106,29 +93,27 @@ INIT : process
 	end process;
 
 	-- Ostali signali 
-	OTH_STIMULI : process
-	begin
+--	OTH_STIMULI : process
+--	begin
+--		-- Mirovanje
+--		KCLK  <= '1';
+--		KDATA <= '1';
+--		wait for CLK_PERIOD * 4;
 
 
-		-- Mirovanje
-		KCLK  <= '1';
-		KDATA <= '1';
-		wait for CLK_PERIOD * 4;
+--		-- Pritisk tipke 
+--		for i in 0 to 10 loop
+--		for j in 0 to 10 loop
+--			kdata <= SIM_DATA(i)(j);
+--			wait for CLK_PERIOD  * 50000;
+--			kclk <= '0';
+--			wait for CLK_PERIOD  * 50000;
+--			kclk <= '1';
+--		end loop;
+--		end loop;
 
-
-		-- Pritisk tipke 
-		for i in 0 to 10 loop
-		for j in 0 to 10 loop
-			kdata <= SIM_DATA(i)(j);
-			wait for CLK_PERIOD  * 50000;
-			kclk <= '0';
-			wait for CLK_PERIOD  * 50000;
-			kclk <= '1';
-		end loop;
-		end loop;
-
-		-- Mirovanje
-		kdata <= '1';
-		wait;
-	end process;
+--		-- Mirovanje
+--		kdata <= '1';
+--		wait;
+--	end process;
 end Behavioral;

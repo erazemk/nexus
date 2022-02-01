@@ -113,7 +113,25 @@ begin
 	GET_CHAR : process(clock, enter, sig_parsed, sig_command)
 	begin
 		if rising_edge(clock) then
-		
+--		    if enter = '1' then
+--		      sig_led_id <= "0000";
+--		      sig_led_enable <= '1';
+--		      sig_state <= '1';
+		      
+--		    enable <= '1';
+		    
+--		    if data = "01001011" then
+--		      sig_led_id <= "0001";
+--		      sig_led_enable <= '1';
+--		      sig_state <= '1';
+	
+		    
+--		    elsif isready = '1' then --L
+--		      sig_led_id <= "0010";
+--		      sig_led_enable <= '1';
+--		      sig_state <= '1';
+--		    end if; 
+
 			-- No need for reset, since it's handled in submodules
 			
 			-- Reset enter_confirm

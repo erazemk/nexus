@@ -121,7 +121,7 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
 	
 	-- Allowed character array
-	type char_array_type is array (0 to 22) of std_logic_vector(7 downto 0);
+	type char_array_type is array (0 to 23) of std_logic_vector(7 downto 0);
 	signal char_array : char_array_type := (
 			"01000101", -- 0
 			"00010110", -- 1
@@ -145,7 +145,8 @@ architecture Behavioral of Nexus is
 			"01000100", -- O
 			"00101101", -- R
 			"00011011", -- S
-			"00101001"  -- Space
+			"00101001", -- Space
+			"01011010"  -- Enter
 		);
 
 begin
@@ -172,6 +173,11 @@ begin
 						else
 							-- Check if char is enter
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
+								SIG_BUFFER_WE <= "1";
+								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
 								SIG_KEYBOARD_ENTER <= '1';

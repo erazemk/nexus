@@ -26,6 +26,8 @@ architecture Behavioral of Executor_Parser is
 	signal state, next_state			: states;
 	signal next_space, first_o, skip	: std_logic;
 	signal saved_symbol                 : std_logic_vector(7 downto 0);
+	signal newchar_delay				: std_logic;
+	signal sig_error					: std_logic;
 
 begin
 
@@ -34,8 +36,9 @@ begin
 	begin
 	
 		if rising_edge(clock) then
-		
-			if parsed_confirm = '1' then
+			newchar <= newchar_delay;
+
+			if parsed_confirm = '1' and enable = '0' then
 				parsed <= '0';
 			end if;
 		
@@ -44,79 +47,86 @@ begin
 				parsed <= '0';
 				skip <= '0';
 				first_o <= '0';
-				newchar <= '1';
-			else
-			    if isready = '1' then
-		          saved_symbol <= symbol;
-		          newchar <= '0';
-		        end if;
-	
+				newchar_delay <= '1';
+			
+			elsif isready = '1' and enable = '1' then
+				saved_symbol <= symbol;
+				newchar_delay <= '0';
+			
+			elsif enable = '1' and parsed = '0' then
 				-- Next state decode
-                if parsed = '0' then
-                    --newchar <= '0';
-                
-                        -- Sync process
-                    if saved_symbol /= "01011010" then --ni Enter oz konec ukaza
-                        if saved_symbol = "00101001" then --Space
-                            next_space <= '1';
-                        else
-                            next_space <= '0';
-                        end if;
-        
-                        -- Pomnjenje stanja in izhoda
-                        state <= next_state;
-                        --TODO pomni izhod 	pulse <= output;
-                    elsif saved_symbol = "01011010" then --Enter oz konec ukaza
-                        parsed <= '1';
-                        next_state <= S_IDLE;
-                    end if;
 				
-				    
-					--next_state <= state;
-					case state is
-						when S_IDLE =>
-							if enable = '1' then
-								next_state <= S_COMMAND;
-							end if;
-						when S_COMMAND =>
-							if next_space = '1' then
-								next_state <= S_ID;	
-								skip <= '0';	
-							elsif skip = '1' then
-								next_state <= S_SKIP;
-							end if; 
-						when S_ID =>
-							if next_space = '1' then
-								next_state <= S_ONOFF;
-							end if;
-						when S_ONOFF =>
-							if next_space = '1' then
-								next_state <= S_VALUE1;
-							end if;
-						when S_SKIP =>
-							if next_space = '1' then
-								next_state <= S_ID;
-								skip <= '0';
-							end if;
-						when S_VALUE1 =>
-								next_state <= S_VALUE2;
-						when S_VALUE2 =>
-								next_state <= S_VALUE3;
-						when S_VALUE3 =>
-								next_state <= S_VALUE4;
-						when S_VALUE4 =>
-								next_state <= S_IDLE;					
-						when others =>
-							next_state <= S_IDLE;
-					  end case;
+				--newchar_delay <= '0';
+			
+				-- Sync process
+				if saved_symbol /= "01011010" then --ni Enter oz konec ukaza
+					if saved_symbol = "00101001" then --Space
+						next_space <= '1';
+					else
+						next_space <= '0';
+					end if;
+	
+					-- Pomnjenje stanja in izhoda
+					state <= next_state;
+				--TODO pomni izhod 	pulse <= output;
+				elsif saved_symbol = "01011010" then --Enter oz konec ukaza
+					parsed <= '1';
+					next_state <= S_IDLE;
 				end if;
+			
+				
+				--next_state <= state;
+				case state is
+					when S_IDLE =>
+						if enable = '1' then
+							next_state <= S_COMMAND;
+						end if;
+					when S_COMMAND =>
+						if next_space = '1' then
+							next_state <= S_ID;	
+							skip <= '0';	
+						elsif skip = '1' then
+							next_state <= S_SKIP;
+						end if;
+						newchar_delay <= '1'; 
+					when S_ID =>
+						if next_space = '1' then
+							next_state <= S_ONOFF;
+						end if;
+						newchar_delay <= '1';
+					when S_ONOFF =>
+						if next_space = '1' then
+							next_state <= S_VALUE1;
+						end if;
+						newchar_delay <= '1';
+					when S_SKIP =>
+						if next_space = '1' then
+							next_state <= S_ID;
+							skip <= '0';
+						end if;
+						newchar_delay <= '1';
+					when S_VALUE1 =>
+							next_state <= S_VALUE2;
+							newchar_delay <= '1';
+					when S_VALUE2 =>
+							next_state <= S_VALUE3;
+							newchar_delay <= '1';
+					when S_VALUE3 =>
+							next_state <= S_VALUE4;
+							newchar_delay <= '1';
+					when S_VALUE4 =>
+							next_state <= S_IDLE;					
+					when others =>
+						next_state <= S_IDLE;
+				end case;
+				
 	
 				-- Output decode
 				case state is 
 					when S_IDLE =>
 						--
 					when S_SKIP =>
-						newchar <= '1';
+						-- newchar_delay <= '1';
 					when S_COMMAND =>
 						if saved_symbol = "01001011" then -- saved_symbol = L
 							command <= "00";
@@ -128,7 +138,7 @@ begin
 							command <= "10";
 							skip <= '1';
 						end if;
-						newchar <= '1';
+						-- newchar_delay <= '1';
 					
 					when S_ID =>
 						if command = "00" then
@@ -150,33 +160,37 @@ begin
 								when "00100100" => led_id <= "1110"; -- E
 								when "00101011"	=> led_id <= "1111"; -- F
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									sig_error <= '1';
 							end case; 
 						elsif command = "01" then
 							case saved_symbol is 
 								when "01000101" => cled_id <= '0'; -- 0
 								when "00010110" => cled_id <= '1'; -- 1
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									-- command <= "00";
+									sig_error <= '1';
 							end case; 					
 						elsif command = "10" then
 							case saved_symbol is 
 								when "01000101" => seg_id <= '0'; -- 0
 								when "00010110" => seg_id <= '1'; -- 1
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									--led_id <= "1111";
+									--onoff <= '1';
+									--command <= "00";
+									sig_error <= '1';
 							end case; 
 						else
-							led_id <= "1111";
-							onoff <= '1';
-							command <= "00";
+							-- led_id <= "1111";
+							-- onoff <= '1';
+							-- command <= "00";
+							sig_error <= '1';
 						end if;
-						newchar <= '1';
+						-- newchar_delay <= '1';
 						
 					when S_ONOFF =>
 						if saved_symbol = "01000100" or first_o = '1' then --saved_symbol = O 
@@ -191,7 +205,7 @@ begin
 								
 							end if;
 						end if;
-						newchar <= '1';
+						-- newchar_delay <= '1';
 					
 					when S_VALUE1 =>
 						if command = "01" then	--RGB LED
@@ -228,9 +242,10 @@ begin
 								when "00100100" => value(15 downto 12) <= "1110"; -- E
 								when "00101011"	=> value(15 downto 12) <= "1111"; -- F
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									-- command <= "00";
+									sig_error <= '1';
 							end case;
 	
 						end if;
@@ -256,9 +271,10 @@ begin
 								when "00100100" => value(11 downto 8) <= "1110"; -- E
 								when "00101011"	=> value(11 downto 8) <= "1111"; -- F
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									-- command <= "00";
+									sig_error <= '1';
 							end case;
 	
 						end if;
@@ -284,9 +300,10 @@ begin
 								when "00100100" => value(7 downto 4) <= "1110"; -- E
 								when "00101011"	=> value(7 downto 4) <= "1111"; -- F
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									-- command <= "00";
+									sig_error <= '1';
 							end case;
 						end if;
 	
@@ -310,18 +327,16 @@ begin
 								when "00100100" => value(3 downto 0) <= "1110"; -- E
 								when "00101011"	=> value(3 downto 0) <= "1111"; -- F
 								when others =>
-									led_id <= "1111";
-									onoff <= '1';
-									command <= "00";
+									-- led_id <= "1111";
+									-- onoff <= '1';
+									-- command <= "00";
+									sig_error <= '1';
 							end case;
 						end if;
 					when others => next_state <= S_IDLE;
 				end case;
 	
 			end if;
-			
-			-- TODO: Toggle newchar before requesting a new character
-			--newchar <= '1';
 
 		end if;
 

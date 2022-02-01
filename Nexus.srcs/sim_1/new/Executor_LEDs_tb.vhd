@@ -8,7 +8,7 @@ end entity;
 
 architecture Behavioral of Executor_LEDs_tb is
 
-    component Executor_LEDs is
+	component Executor_LEDs is
 		Port (
 			clock	: in std_logic;
 			reset	: in std_logic;
@@ -19,7 +19,7 @@ architecture Behavioral of Executor_LEDs_tb is
 		);
 	end component;
 
-    constant CLK_PERIOD : time := 10 ns;
+	constant CLK_PERIOD : time := 10 ns;
 
 	signal clock, reset, enable, state : std_logic := '0';
 	signal id : std_logic_vector (3 downto 0) := "0000";
@@ -27,8 +27,8 @@ architecture Behavioral of Executor_LEDs_tb is
 
 begin
 
-    UUT : Executor_LEDs
-    port map(
+	UUT : Executor_LEDs
+	port map(
 		clock => clock,
 		reset => reset,
 		enable => enable,
@@ -59,7 +59,7 @@ begin
 
 		end loop;
 
-		wait; -- èakaj neskonèno dolgo      
+		wait; -- cakaj neskoncno dolgo      
 	end process;
 
 end architecture;

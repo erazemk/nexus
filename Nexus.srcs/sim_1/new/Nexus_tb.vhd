@@ -34,7 +34,7 @@ architecture Behavioral of Nexus_tb is
     end component;
 
 
-	-- Vhodni signali, ki UUT povezujejo z generatorjem dražljajev
+	-- Vhodni signali, ki UUT povezujejo z generatorjem draï¿½ljajev
 	signal CLOCK, RESET     : std_logic := '0';
 	signal KCLK, KDATA  : std_logic := '1';
 	signal VGA_HS, VGA_VS : std_logic;

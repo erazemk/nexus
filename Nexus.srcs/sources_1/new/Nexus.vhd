@@ -189,15 +189,15 @@ begin
 								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER - 1;
 								SIG_BUFFER_DIN <= (others => '0');
 							else
-								for i in 0 to char_array'length - 1 loop
+--								for i in 0 to char_array'length - 1 loop
 									-- Check if character is valid
-									if SIG_KEYBOARD_CHAR = char_array(i) then
+--									if SIG_KEYBOARD_CHAR = char_array(i) then
 										SIG_BUFFER_WE <= "1";
 										SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
 										SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
 										SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
-									end if;
-								end loop;
+--									end if;
+--								end loop;
 							end if;
 						end if;
 					end if;

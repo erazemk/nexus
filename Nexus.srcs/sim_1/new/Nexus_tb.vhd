@@ -51,15 +51,15 @@ architecture Behavioral of Nexus_tb is
 	--  1    0  0101 1010     0 "10 01011010 0" 
 	type char_arr_type is array (0 to 8) of std_logic_vector(10 downto 0);
 	signal char_arr : char_arr_type := (
-		"10110100100", -- L
-		"10001001000", -- E
-		"10110001000", -- D
-		"10100101000", -- Space
-		"10011010000", -- 1
-		"10100101000", -- Space
-		"10001000100", -- O
-		"10100011000", -- N
-		"10010110100"  -- Enter
+		"00100101101", -- L
+		"00010010001", -- E
+		"00010001101", -- D
+		"00010100101", -- Space
+		"00001011001", -- 1
+		"00010100101", -- Space
+		"00100010001", -- O
+		"00011000101", -- N
+		"00101101001"  -- Enter
 	);
 	signal simbol : std_logic_vector(10 downto 0);
 	constant SIM_DATA   : std_logic_vector(10 downto 0) := "10010110100";
@@ -100,13 +100,13 @@ begin
 	OTH_STIMULI : process
 	begin
 		-- Reset
-		RESET   <= '1';
+		RESET   <= '0';
 		KCLK  <= '1';
 		KDATA <= '1';
 		wait for CLK_PERIOD * 3;
 
 		-- Mirovanje
-		RESET   <= '0';
+		RESET   <= '1';
 		KCLK  <= '1';
 		KDATA <= '1';
 		wait for CLK_PERIOD * 3;
@@ -128,8 +128,15 @@ begin
 		end loop;
 
 		-- Mirovanje
-		KCLK  <= '1';
+		--KCLK  <= '1';
 		KDATA <= '1';
+		
+		for i in 0 to 5 loop
+			wait for CLK_PERIOD * 6;
+			KCLK <= '0';
+			wait for CLK_PERIOD * 6;
+			KCLK <= '1';
+		end loop;
 		wait;
 	end process;
 

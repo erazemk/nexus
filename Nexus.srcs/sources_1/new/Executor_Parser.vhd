@@ -14,7 +14,6 @@ entity Executor_Parser is
 		command			: out std_logic := '0';
 		id				: out std_logic_vector(3 downto 0) := (others => '0');
 		onoff			: out std_logic := '0';
-		value			: out std_logic_vector(1 downto 0) := (others => '0');
 		wanted_char_at	: out std_logic_vector(8 downto 0) := (others => '0'); 
 		want_new_char	: out std_logic := '0'
 	);
@@ -25,10 +24,10 @@ architecture Behavioral of Executor_Parser is
 	signal sig_command : std_logic := '0';
 	signal sig_id : std_logic_vector(3 downto 0) := (others => '0');
 	signal sig_onoff : std_logic := '0';
-	signal sig_value : std_logic_vector(1 downto 0) := (others => '0');
 	signal line_counter : unsigned(4 downto 0) := (others => '0');
 	signal argument_counter : unsigned(1 downto 0) := (others => '0');
 	signal sig_error : std_logic := '0'; -- Should never be 1
+	signal char_flag : std_logic := '0';
 
 begin
 
@@ -38,6 +37,7 @@ begin
 		if rising_edge(clock) then
 			if reset = '1' then
 				sig_command <= '0';
+				char_flag <= '0';
 				sig_id <= (others => '0');
 				sig_onoff <= '0';
 				line_counter <= (others => '0');
@@ -50,19 +50,21 @@ begin
 			elsif parsed_confirm = '1' then
 				parsed <= '0';
 			elsif parsed_confirm = '0' and start_parsing = '1' then
-				if char_is_ready = '0' and argument_counter <= 3 then
+				if char_is_ready = '0' then
 					-- Command: 0, id: 4, state: 7
 					wanted_char_at <= std_logic_vector(unsigned(line_counter & "0000") + argument_counter);
 					want_new_char <= '1';
-				else
+					char_flag <= '0';
+				elsif char_flag = '0' then
 					want_new_char <= '0';
 					if argument_counter = 0 then -- Command
 						case char is
-							when "01001011" => sig_command <= '0'; -- L
-							when "00100001" => sig_command <= '1'; -- C
+							when "01001011" => sig_command <= '1'; -- L
+							when "00100001" => sig_command <= '0'; -- C
 							when others => sig_error <= '1';
 						end case;
 						argument_counter <= argument_counter + 1;
+						char_flag <= '1';
 					elsif argument_counter = 1 then -- Id
 						case char is
 							when "01000101" => sig_id <= "0000"; -- 0
@@ -86,6 +88,7 @@ begin
 							when others => sig_id <= "1111";
 						end case;
 						argument_counter <= argument_counter + 1;
+						char_flag <= '1';
 					elsif argument_counter = 2 then  -- State
 						case char is
 							when "00110001" => sig_onoff <= '1'; -- N
@@ -93,23 +96,15 @@ begin
 							when others => sig_error <= '1';
 						end case;
 						argument_counter <= argument_counter + 1;
-					elsif sig_command = '1' and argument_counter = 3 then -- Value
-						case char is
-							when "00000000" => sig_value <= "00"; -- White
-							when "00101101" => sig_value <= "01"; -- Red
-							when "00110100" => sig_value <= "10"; -- Green
-							when "00110010" => sig_value <= "11"; -- Blue
-							when others => sig_error <= '1';
-						end case;
+						char_flag <= '1';
 					else -- Finished parsing
 						parsed <= '1';
+						char_flag <= '0';
 						line_counter <= line_counter + 1;
 						command <= sig_command;
 						id <= sig_id;
 						onoff <= sig_onoff;
-						value <= sig_value;
 						sig_command <= '0';
-						sig_value <= (others => '0');
 						sig_onoff <= '0';
 						sig_id <= (others => '0');
 						argument_counter <= (others => '0');

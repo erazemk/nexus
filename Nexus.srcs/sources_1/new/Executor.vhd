@@ -35,31 +35,6 @@ architecture Behavioral of Executor is
 		);
 	end component;
 	
-	component Executor_RGB_LEDs is
-		Port (
-			clock	: in std_logic;
-			reset	: in std_logic;
-			enable	: in std_logic; -- Signals when to write to an LED
-			state	: in std_logic; -- Whether LED should be on (1) or off (0)
-			id		: in std_logic; -- ID of LED to write to
-			color	: in std_logic_vector (1 downto 0); -- Color for the LED, either 0 - White, 1 - Red, 2 - Green or 3 - Blue
-			cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
-			cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
-		);
-	end component;
-	
-	component Executor_7_Segment_Display is
-		Port (
-			clock	: in std_logic;
-			reset	: in std_logic;
-			enable	: in std_logic; -- Signals when to write to a display
-			state1	: in std_logic; -- Whether display should be on (1) or off (0)
-			state2	: in std_logic; -- Whether display should be on (1) or off (0)
-			value	: in std_logic_vector (31 downto 0); -- Value to write to display
-			cathode	: out std_logic_vector (7 downto 0);
-			anode	: out std_logic_vector (7 downto 0)
-		);
-	end component;
 
 	component Executor_Parser is
 		Port ( 
@@ -73,7 +48,6 @@ architecture Behavioral of Executor is
 			command			: out std_logic := '0';
 			id				: out std_logic_vector(3 downto 0) := (others => '0');
 			onoff			: out std_logic := '0';
-			value			: out std_logic_vector(1 downto 0) := (others => '0');
 			wanted_char_at	: out std_logic_vector(8 downto 0) := (others => '0'); 
 			want_new_char	: out std_logic
 		);
@@ -84,24 +58,12 @@ architecture Behavioral of Executor is
 	signal sig_parsed		: std_logic := '0'; -- Enabled when parser has parsed line
 	signal sig_command		: std_logic := '0'; -- 0 = LED, 1 = RGB LED
 	signal sig_id			: std_logic_vector(3 downto 0) := (others => '0'); -- ID of module element (e.g. LED with ID 1)
-	signal sig_value		: std_logic_vector(1 downto 0) := (others => '0'); -- Used for RGB LEDs and segments (e.g. CLED 1 R[ed] or SEG 1 BEEF)
 	signal parsed_confirm	: std_logic := '0';
 	
 	-- LED signals
 	signal sig_led_enable	: std_logic := '0';
 	signal sig_led_id		: std_logic_vector (3 downto 0) := (others => '0');
 	
-	-- RGB LED signals
-	signal sig_rgb_enable	: std_logic := '0';
-	signal sig_rgb_id		: std_logic := '0';
-	signal sig_rgb_color	: std_logic_vector (1 downto 0) := (others => '0');
-
-	-- 7-segment display signals
---	signal sig_seg_enable	: std_logic;
---	signal sig_seg1_state	: std_logic;
---	signal sig_seg2_state	: std_logic;
---	signal sig_seg_id		: std_logic; -- Display id, either 1 (left display) or 0 (right display)
---	signal sig_seg_value	: std_logic_vector (31 downto 0); -- Binary value for one of the displays
 
 begin
 
@@ -119,22 +81,13 @@ begin
 			if sig_parsed = '0' then
 				parsed_confirm <= '0';
 				sig_led_enable <= '0';
-				sig_rgb_enable <= '0';
---				sig_seg_enable <= '0';
 			end if;
 
 			if sig_parsed = '1' then
 				enter_confirm <= '1';
 				parsed_confirm <= '1'; -- Set parsed confirmation
-				
-				if sig_command = '0' then
-					sig_led_enable <= '1';
-					sig_led_id <= sig_id;
-				else
-					sig_rgb_enable <= '1';
-					sig_rgb_id <= sig_id(0);
-					sig_rgb_color <= sig_value;
-				end if;
+				sig_led_enable <= '1';
+				sig_led_id <= sig_id;
 			end if;
 		end if;
 
@@ -150,29 +103,6 @@ begin
 		led => led
 	);
 	
-	module_rgb_led: Executor_RGB_LEDs
-	port map (
-		clock => clock,
-		reset => reset,
-		enable => sig_rgb_enable,
-		state => sig_state,
-		id => sig_rgb_id,
-		color => sig_rgb_color,
-		cled0 => cled0,
-		cled1 => cled1
-	);
-	
---	module_seven_segment_display: Executor_7_Segment_Display
---	port map (
---		clock => clock,
---		reset => reset,
---		enable => sig_seg_enable,
---		state1 => sig_seg1_state,
---		state2 => sig_seg2_state,
---		value => sig_seg_value,
---		cathode => cathode,
---		anode => anode
---	);
 
 	module_parser: Executor_Parser
 	port map (
@@ -186,7 +116,6 @@ begin
 		command => sig_command,
 		id => sig_id,
 		onoff => sig_state,
-		value => sig_value,
 		wanted_char_at => data_index,
 		want_new_char => enable
 	);

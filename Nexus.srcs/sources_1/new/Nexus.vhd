@@ -117,7 +117,7 @@ architecture Behavioral of Nexus is
 
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
-	--signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
+	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
 	signal SIG_EXECUTOR_INDEX	: std_logic_vector(8 downto 0);
@@ -156,12 +156,11 @@ begin
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	main_proc: process(CLOCK, SIG_RESET, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR, SIG_KEYBOARD_CONFIRM)
+	main_proc: process(CLOCK)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_KEYBOARD_COUNTER <= (others => '0');
-				--SIG_EXECUTOR_COUNTER <= (others => '0');
 			else
 				-- Keyboard has sent new character
 				if SIG_KEYBOARD_EOT = '1' then
@@ -175,10 +174,6 @@ begin
 						else
 							-- Check if char is enter
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
---								SIG_BUFFER_WE <= "1";
---								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
---								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
---								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
 
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
@@ -206,14 +201,18 @@ begin
 					SIG_BUFFER_WE <= "0";
 					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_INDEX);
 					SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
-					--SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-					SIG_EXECUTOR_READY <= '1';
+					
+					if SIG_EXECUTOR_COUNTER < 3 then
+					   SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+					else
+					   SIG_EXECUTOR_READY <= '1';
+					   SIG_EXECUTOR_COUNTER <= (others => '0'); 
+					end if;
 				else
 					SIG_EXECUTOR_READY <= '0';
 
 					if SIG_KEYBOARD_CONFIRM = '1' then
 						SIG_KEYBOARD_ENTER <= '0';
-						--SIG_EXECUTOR_COUNTER <= SIG_KEYBOARD_COUNTER;
 					end if;
 				end if;
 			end if;
@@ -221,7 +220,7 @@ begin
 	end process;
 	
 	-- Read character from buffer and send it to VGA module
-	vga_proc: process(CLOCK, SIG_RESET, SIG_VGA_NEWCHAR)
+	vga_proc: process(CLOCK)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then

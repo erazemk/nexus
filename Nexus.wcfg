@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Nexus_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Nexus_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,946.001 ns"></ZoomEndTime>
+      <Cursor1Time time="1,000.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="232"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="26" />
+   <wvobject type="logic" fp_name="/Nexus_tb/CLOCK">
+      <obj_property name="ElementShortName">CLOCK</obj_property>
+      <obj_property name="ObjectShortName">CLOCK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/CLOCK">
+      <obj_property name="ElementShortName">CLOCK</obj_property>
+      <obj_property name="ObjectShortName">CLOCK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_RESET">
+      <obj_property name="ElementShortName">SIG_RESET</obj_property>
+      <obj_property name="ObjectShortName">SIG_RESET</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/KCLK">
+      <obj_property name="ElementShortName">KCLK</obj_property>
+      <obj_property name="ObjectShortName">KCLK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/KDATA">
+      <obj_property name="ElementShortName">KDATA</obj_property>
+      <obj_property name="ObjectShortName">KDATA</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/char_arr">
+      <obj_property name="ElementShortName">char_arr[0:8][10:0]</obj_property>
+      <obj_property name="ObjectShortName">char_arr[0:8][10:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/simbol">
+      <obj_property name="ElementShortName">simbol[10:0]</obj_property>
+      <obj_property name="ObjectShortName">simbol[10:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_BUFFER_WE">
+      <obj_property name="ElementShortName">SIG_BUFFER_WE[0:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_BUFFER_WE[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_BUFFER_ADDR_A">
+      <obj_property name="ElementShortName">SIG_BUFFER_ADDR_A[8:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_BUFFER_ADDR_A[8:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_BUFFER_DIN">
+      <obj_property name="ElementShortName">SIG_BUFFER_DIN[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_BUFFER_DIN[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_BUFFER_DATA_A">
+      <obj_property name="ElementShortName">SIG_BUFFER_DATA_A[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_BUFFER_DATA_A[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_KEYBOARD_EOT">
+      <obj_property name="ElementShortName">SIG_KEYBOARD_EOT</obj_property>
+      <obj_property name="ObjectShortName">SIG_KEYBOARD_EOT</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_KEYBOARD_ENTER">
+      <obj_property name="ElementShortName">SIG_KEYBOARD_ENTER</obj_property>
+      <obj_property name="ObjectShortName">SIG_KEYBOARD_ENTER</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_KEYBOARD_CHAR">
+      <obj_property name="ElementShortName">SIG_KEYBOARD_CHAR[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_KEYBOARD_CHAR[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_KEYBOARD_COUNTER">
+      <obj_property name="ElementShortName">SIG_KEYBOARD_COUNTER[8:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_KEYBOARD_COUNTER[8:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_KEYBOARD_CONFIRM">
+      <obj_property name="ElementShortName">SIG_KEYBOARD_CONFIRM</obj_property>
+      <obj_property name="ObjectShortName">SIG_KEYBOARD_CONFIRM</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_EXECUTOR_CHAR">
+      <obj_property name="ElementShortName">SIG_EXECUTOR_CHAR[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_EXECUTOR_CHAR[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/SIG_EXECUTOR_COUNTER">
+      <obj_property name="ElementShortName">SIG_EXECUTOR_COUNTER[8:0]</obj_property>
+      <obj_property name="ObjectShortName">SIG_EXECUTOR_COUNTER[8:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_EXECUTOR_NEWCHAR">
+      <obj_property name="ElementShortName">SIG_EXECUTOR_NEWCHAR</obj_property>
+      <obj_property name="ObjectShortName">SIG_EXECUTOR_NEWCHAR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/SIG_EXECUTOR_READY">
+      <obj_property name="ElementShortName">SIG_EXECUTOR_READY</obj_property>
+      <obj_property name="ObjectShortName">SIG_EXECUTOR_READY</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/module_executor/sig_command">
+      <obj_property name="ElementShortName">sig_command[1:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_command[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/module_executor/sig_state">
+      <obj_property name="ElementShortName">sig_state</obj_property>
+      <obj_property name="ObjectShortName">sig_state</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/module_executor/sig_parsed">
+      <obj_property name="ElementShortName">sig_parsed</obj_property>
+      <obj_property name="ObjectShortName">sig_parsed</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/UUT/module_executor/sig_id">
+      <obj_property name="ElementShortName">sig_id[3:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_id[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Nexus_tb/UUT/module_executor/sig_led_enable">
+      <obj_property name="ElementShortName">sig_led_enable</obj_property>
+      <obj_property name="ObjectShortName">sig_led_enable</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Nexus_tb/LED">
+      <obj_property name="ElementShortName">LED[15:0]</obj_property>
+      <obj_property name="ObjectShortName">LED[15:0]</obj_property>
+   </wvobject>
+</wave_config>

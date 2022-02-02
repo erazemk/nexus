@@ -38,7 +38,7 @@ architecture Behavioral of Executor_Parser is
 
 begin
 
-	SYNC_PROC : process(clock, isready, enable, reset, symbol, parsed)
+	SYNC_PROC : process(clock)
 	begin
 		if rising_edge(clock) then
 			if reset = '1' then

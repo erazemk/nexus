@@ -49,19 +49,22 @@ architecture Behavioral of Nexus_tb is
 	-- Podatke pisemo v smeri, ki je obratna, kot ce bi jih pisali glede na cas.
 	-- STOP PAR B7...... B0 START
 	--  1    0  0101 1010     0 "10 01011010 0" 
-	type char_arr_type is array (0 to 8) of std_logic_vector(7 downto 0);
+	type char_arr_type is array (0 to 8) of std_logic_vector(10 downto 0);
 	signal char_arr : char_arr_type := (
-		"01001011", -- L
-		"00100100", -- E
-		"00100011", -- D
-		"00101001", -- Space
-		"00111110", -- 8
-		"00101001", -- Space
-		"01000100", -- O
-		"00110001", -- N
-		"01011010"  -- Enter
+		"10110100100", -- L
+		"10001001000", -- E
+		"10110001000", -- D
+		"10100101000", -- Space
+		"10011010000", -- 1
+		"10100101000", -- Space
+		"10001000100", -- O
+		"10100011000", -- N
+		"10010110100"  -- Enter
 	);
+	signal simbol : std_logic_vector(10 downto 0);
+	constant SIM_DATA   : std_logic_vector(10 downto 0) := "10010110100";
 
+                                                            
 begin
 
 	UUT : Nexus
@@ -92,28 +95,73 @@ begin
 		wait for CLK_PERIOD/2;
 	end process;
 
-	-- Ostali signali 
+
+     --Ostali signali 
+	OTH_STIMULI : process
+	begin
+		-- Reset
+		RESET   <= '1';
+		KCLK  <= '1';
+		KDATA <= '1';
+		wait for CLK_PERIOD * 3;
+
+		-- Mirovanje
+		RESET   <= '0';
+		KCLK  <= '1';
+		KDATA <= '1';
+		wait for CLK_PERIOD * 3;
+
+		-- Zamik ure tipkovnice, da (namenoma) ne bo sinhrona z notranjo uro
+		wait for CLK_PERIOD/3;
+
+		-- LED 1 ONEnter
+		for i in 0 to 8 loop
+		  simbol <= char_arr(i);
+		  for j in 0 to 10 loop
+			KDATA <= simbol(j);
+			wait for CLK_PERIOD * 6;
+			KCLK <= '0';
+			wait for CLK_PERIOD * 6;
+			KCLK <= '1';
+		  end loop;
+		  
+		end loop;
+
+		-- Mirovanje
+		KCLK  <= '1';
+		KDATA <= '1';
+		wait;
+	end process;
+
 --	OTH_STIMULI : process
 --	begin
+--		-- Reset
+--		RESET   <= '0';
+--		KCLK  <= '1';
+--		KDATA <= '1';
+--		wait for CLK_PERIOD * 3;
+
+--		-- Mirovanje
+--		RESET   <= '1';
+--		KCLK  <= '1';
+--		KDATA <= '1';
+--		wait for CLK_PERIOD * 3;
+
+--		-- Zamik ure tipkovnice, da (namenoma) ne bo sinhrona z notranjo uro
+--		wait for CLK_PERIOD/3;
+
+--		-- Pritisk tipke ENTER
+--		for i in 0 to 10 loop
+--			KDATA <= SIM_DATA(i);
+--			wait for CLK_PERIOD * 6;
+--			KCLK <= '0';
+--			wait for CLK_PERIOD * 6;
+--			KCLK <= '1';
+--		end loop;
+
 --		-- Mirovanje
 --		KCLK  <= '1';
 --		KDATA <= '1';
---		wait for CLK_PERIOD * 4;
-
-
---		-- Pritisk tipke 
---		for i in 0 to 10 loop
---		for j in 0 to 10 loop
---			kdata <= SIM_DATA(i)(j);
---			wait for CLK_PERIOD  * 50000;
---			kclk <= '0';
---			wait for CLK_PERIOD  * 50000;
---			kclk <= '1';
---		end loop;
---		end loop;
-
---		-- Mirovanje
---		kdata <= '1';
 --		wait;
 --	end process;
 end Behavioral;

@@ -110,7 +110,7 @@ begin
 
 	sig_rgb_color <= sig_value(1 downto 0);
 
-	GET_CHAR : process(clock, enter, sig_parsed, sig_command)
+	GET_CHAR : process(clock)
 	begin
 		if rising_edge(clock) then
 --		    if enter = '1' then

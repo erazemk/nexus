@@ -119,6 +119,7 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
+
 	
 	-- Allowed character array
 	type char_array_type is array (0 to 23) of std_logic_vector(7 downto 0);
@@ -154,7 +155,7 @@ begin
 	SIG_RESET <= not RESET;
 	
 	-- Read character from keyboard module and write it into
-	main_proc: process(CLOCK, SIG_RESET, SIG_KEYBOARD_EOT, SIG_EXECUTOR_NEWCHAR, SIG_KEYBOARD_CONFIRM)
+	main_proc: process(CLOCK)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
@@ -200,12 +201,14 @@ begin
 							end if;
 						end if;
 					end if;
-				elsif SIG_EXECUTOR_NEWCHAR = '1' then
-					SIG_BUFFER_WE <= "0";
-					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
-					SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
-					SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
-					SIG_EXECUTOR_READY <= '1';
+				elsif SIG_EXECUTOR_NEWCHAR = '1' and SIG_KEYBOARD_ENTER = '1' then
+				    if SIG_EXECUTOR_READY = '0'then 
+					   SIG_BUFFER_WE <= "0";
+					   SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
+					   SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
+					   SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+					   SIG_EXECUTOR_READY <= '1';
+					end if;
 				else
 					SIG_EXECUTOR_READY <= '0';
 
@@ -219,7 +222,7 @@ begin
 	end process;
 	
 	-- Read character from buffer and send it to VGA module
-	vga_proc: process(CLOCK, SIG_RESET, SIG_VGA_NEWCHAR)
+	vga_proc: process(CLOCK)
 	begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then

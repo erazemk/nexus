@@ -39,6 +39,7 @@ architecture Behavioral of Nexus is
 			enter			: in std_logic; -- Signals that a new line has been written
 			enter_confirm	: out std_logic;
 			data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
+			data_index		: out std_logic_vector(8 downto 0);
 			enable			: out std_logic; -- Signals that a new character should be sent to data
 			isready			: in std_logic;
 			led				: out std_logic_vector (15 downto 0); -- LEDs
@@ -116,9 +117,10 @@ architecture Behavioral of Nexus is
 
 	-- Executor signals
 	signal SIG_EXECUTOR_CHAR	: std_logic_vector (7 downto 0);
-	signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
+	--signal SIG_EXECUTOR_COUNTER	: unsigned (8 downto 0) := (others => '0');
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
+	signal SIG_EXECUTOR_INDEX	: std_logic_vector(8 downto 0);
 	
 	-- Allowed character array
 	type char_array_type is array (0 to 23) of std_logic_vector(7 downto 0);
@@ -159,7 +161,7 @@ begin
 		if rising_edge(CLOCK) then
 			if SIG_RESET = '1' then
 				SIG_KEYBOARD_COUNTER <= (others => '0');
-				SIG_EXECUTOR_COUNTER <= (others => '0');
+				--SIG_EXECUTOR_COUNTER <= (others => '0');
 			else
 				-- Keyboard has sent new character
 				if SIG_KEYBOARD_EOT = '1' then
@@ -173,10 +175,10 @@ begin
 						else
 							-- Check if char is enter
 							if SIG_KEYBOARD_CHAR = "01011010" then -- char = Enter
-								SIG_BUFFER_WE <= "1";
-								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
-								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
-								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
+--								SIG_BUFFER_WE <= "1";
+--								SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_KEYBOARD_COUNTER);
+--								SIG_BUFFER_DIN <= SIG_KEYBOARD_CHAR;
+--								SIG_KEYBOARD_COUNTER <= SIG_KEYBOARD_COUNTER + 1;
 
 								-- Round up to the nearest next multiple of 16 (to start at a new line)
 								SIG_KEYBOARD_COUNTER <= (SIG_KEYBOARD_COUNTER(8 downto 4) + 1) & "0000";
@@ -202,16 +204,16 @@ begin
 					end if;
 				elsif SIG_EXECUTOR_NEWCHAR = '1' then
 					SIG_BUFFER_WE <= "0";
-					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_COUNTER);
+					SIG_BUFFER_ADDR_A <= std_logic_vector(SIG_EXECUTOR_INDEX);
 					SIG_EXECUTOR_CHAR <= SIG_BUFFER_DATA_A;
-					SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
+					--SIG_EXECUTOR_COUNTER <= SIG_EXECUTOR_COUNTER + 1;
 					SIG_EXECUTOR_READY <= '1';
 				else
 					SIG_EXECUTOR_READY <= '0';
 
 					if SIG_KEYBOARD_CONFIRM = '1' then
 						SIG_KEYBOARD_ENTER <= '0';
-						SIG_EXECUTOR_COUNTER <= SIG_KEYBOARD_COUNTER;
+						--SIG_EXECUTOR_COUNTER <= SIG_KEYBOARD_COUNTER;
 					end if;
 				end if;
 			end if;
@@ -248,6 +250,7 @@ begin
 		enable => SIG_EXECUTOR_NEWCHAR,
 		isready => SIG_EXECUTOR_READY,
 		data => SIG_EXECUTOR_CHAR,
+		data_index => SIG_EXECUTOR_INDEX,
 		led => LED,
 		anode => AN,
 		cathode => CA,

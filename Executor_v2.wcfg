@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="311.201 ns"></ZoomEndTime>
-      <Cursor1Time time="186.400 ns"></Cursor1Time>
+      <ZoomEndTime time="188.801 ns"></ZoomEndTime>
+      <Cursor1Time time="269.830 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="184"></NameColumnWidth>
-      <ValueColumnWidth column_width="88"></ValueColumnWidth>
+      <NameColumnWidth column_width="174"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="21" />
+   <WVObjectSize size="26" />
    <wvobject fp_name="/Executor_tb/clock" type="logic">
       <obj_property name="ElementShortName">clock</obj_property>
       <obj_property name="ObjectShortName">clock</obj_property>
@@ -44,33 +44,61 @@
       <obj_property name="ElementShortName">enter_confirm</obj_property>
       <obj_property name="ObjectShortName">enter_confirm</obj_property>
    </wvobject>
+   <wvobject fp_name="/Executor_tb/data_index" type="array">
+      <obj_property name="ElementShortName">data_index[8:0]</obj_property>
+      <obj_property name="ObjectShortName">data_index[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/enable" type="logic">
+      <obj_property name="ElementShortName">enable</obj_property>
+      <obj_property name="ObjectShortName">enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/led" type="array">
+      <obj_property name="ElementShortName">led[15:0]</obj_property>
+      <obj_property name="ObjectShortName">led[15:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/Executor_tb/arr" type="array">
-      <obj_property name="ElementShortName">arr[0:47][7:0]</obj_property>
-      <obj_property name="ObjectShortName">arr[0:47][7:0]</obj_property>
+      <obj_property name="ElementShortName">arr[0:2][7:0]</obj_property>
+      <obj_property name="ObjectShortName">arr[0:2][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/Executor_tb/UUT/module_parser/command" type="logic">
-      <obj_property name="ElementShortName">command</obj_property>
-      <obj_property name="ObjectShortName">command</obj_property>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/char" type="array">
+      <obj_property name="ElementShortName">char[7:0]</obj_property>
+      <obj_property name="ObjectShortName">char[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/Executor_tb/UUT/module_parser/onoff" type="logic">
-      <obj_property name="ElementShortName">onoff</obj_property>
-      <obj_property name="ObjectShortName">onoff</obj_property>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/parsed_confirm" type="logic">
+      <obj_property name="ElementShortName">parsed_confirm</obj_property>
+      <obj_property name="ObjectShortName">parsed_confirm</obj_property>
    </wvobject>
    <wvobject fp_name="/Executor_tb/UUT/module_parser/parsed" type="logic">
       <obj_property name="ElementShortName">parsed</obj_property>
       <obj_property name="ObjectShortName">parsed</obj_property>
    </wvobject>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/want_new_char" type="logic">
+      <obj_property name="ElementShortName">want_new_char</obj_property>
+      <obj_property name="ObjectShortName">want_new_char</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/wanted_char_at" type="array">
+      <obj_property name="ElementShortName">wanted_char_at[8:0]</obj_property>
+      <obj_property name="ObjectShortName">wanted_char_at[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/argument_counter" type="array">
+      <obj_property name="ElementShortName">argument_counter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">argument_counter[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/line_counter" type="array">
+      <obj_property name="ElementShortName">line_counter[4:0]</obj_property>
+      <obj_property name="ObjectShortName">line_counter[4:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_error" type="logic">
       <obj_property name="ElementShortName">sig_error</obj_property>
       <obj_property name="ObjectShortName">sig_error</obj_property>
    </wvobject>
-   <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_id" type="array">
-      <obj_property name="ElementShortName">sig_id[3:0]</obj_property>
-      <obj_property name="ObjectShortName">sig_id[3:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_command" type="logic">
       <obj_property name="ElementShortName">sig_command</obj_property>
       <obj_property name="ObjectShortName">sig_command</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_id" type="array">
+      <obj_property name="ElementShortName">sig_id[3:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_id[3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_onoff" type="logic">
       <obj_property name="ElementShortName">sig_onoff</obj_property>
@@ -79,14 +107,6 @@
    <wvobject fp_name="/Executor_tb/UUT/module_parser/sig_value" type="array">
       <obj_property name="ElementShortName">sig_value[1:0]</obj_property>
       <obj_property name="ObjectShortName">sig_value[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/Executor_tb/UUT/module_parser/line_counter" type="array">
-      <obj_property name="ElementShortName">line_counter[4:0]</obj_property>
-      <obj_property name="ObjectShortName">line_counter[4:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/Executor_tb/UUT/module_parser/argument_counter" type="array">
-      <obj_property name="ElementShortName">argument_counter[1:0]</obj_property>
-      <obj_property name="ObjectShortName">argument_counter[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/Executor_tb/UUT/module_led/enable" type="logic">
       <obj_property name="ElementShortName">enable</obj_property>

@@ -10,7 +10,8 @@ entity Executor is
 		enter			: in std_logic; -- Signals that a new line has been written
 		enter_confirm	: out std_logic := '0';
 		data			: in std_logic_vector (7 downto 0); -- Character read from the buffer
-		enable			: out std_logic := '0'; -- Signals that a new character should be sent to data
+		data_index		: out std_logic_vector(8 downto 0);
+		enable			: out std_logic; -- Signals that a new character should be sent to data
 		isready			: in std_logic;
 		led				: out std_logic_vector (15 downto 0); -- LEDs
 		anode			: out std_logic_vector (7 downto 0) := (others => '1'); -- 7-seg anode
@@ -54,7 +55,6 @@ architecture Behavioral of Executor is
 			enable	: in std_logic; -- Signals when to write to a display
 			state1	: in std_logic; -- Whether display should be on (1) or off (0)
 			state2	: in std_logic; -- Whether display should be on (1) or off (0)
-			-- id		: in std_logic; -- Display to write to
 			value	: in std_logic_vector (31 downto 0); -- Value to write to display
 			cathode	: out std_logic_vector (7 downto 0);
 			anode	: out std_logic_vector (7 downto 0)
@@ -65,73 +65,49 @@ architecture Behavioral of Executor is
 		Port ( 
 			clock			: in std_logic;
 			reset			: in std_logic;
-			symbol			: in std_logic_vector(7 downto 0);
-			enable			: in std_logic;
-			parsed			: inout std_logic;
+			char			: in std_logic_vector(7 downto 0);
+			start_parsing	: in std_logic;
 			parsed_confirm	: in std_logic;
-			command			: inout std_logic_vector(1 downto 0);
-			led_id			: out std_logic_vector(3 downto 0);
-			cled_id			: out std_logic;
-			seg_id			: out std_logic;
-			onoff			: out std_logic;
-			value			: out std_logic_vector(15 downto 0);
-			newchar			: out std_logic;
-			isready			: in std_logic
+			char_is_ready	: in std_logic;
+			parsed			: out std_logic := '0';
+			command			: out std_logic := '0';
+			id				: out std_logic_vector(3 downto 0) := (others => '0');
+			onoff			: out std_logic := '0';
+			value			: out std_logic_vector(1 downto 0) := (others => '0');
+			wanted_char_at	: out std_logic_vector(8 downto 0) := (others => '0'); 
+			want_new_char	: out std_logic
 		);
 	end component;
 	
 	-- Shared signals
-	signal sig_state		: std_logic; -- Whether a module is enabled or disabled (e.g. LED = ON/OFF)
-	signal sig_parsed		: std_logic; -- Enabled when parser has parsed line
-	signal sig_command		: std_logic_vector(1 downto 0); -- 0 = LED, 1 = RGB LED, 2 = SEG
-	signal sig_id			: std_logic_vector(3 downto 0); -- ID of module element (e.g. LED with ID 1)
-	signal sig_value		: std_logic_vector(15 downto 0); -- Used for RGB LEDs and segments (e.g. CLED 1 R[ed] or SEG 1 BEEF)
-	signal parsed_confirm	: std_logic;
+	signal sig_state		: std_logic := '0'; -- Whether a module is enabled or disabled (e.g. LED = ON/OFF)
+	signal sig_parsed		: std_logic := '0'; -- Enabled when parser has parsed line
+	signal sig_command		: std_logic := '0'; -- 0 = LED, 1 = RGB LED
+	signal sig_id			: std_logic_vector(3 downto 0) := (others => '0'); -- ID of module element (e.g. LED with ID 1)
+	signal sig_value		: std_logic_vector(1 downto 0) := (others => '0'); -- Used for RGB LEDs and segments (e.g. CLED 1 R[ed] or SEG 1 BEEF)
+	signal parsed_confirm	: std_logic := '0';
 	
 	-- LED signals
-	signal sig_led_enable	: std_logic;
-	signal sig_led_id		: std_logic_vector (3 downto 0);
+	signal sig_led_enable	: std_logic := '0';
+	signal sig_led_id		: std_logic_vector (3 downto 0) := (others => '0');
 	
 	-- RGB LED signals
-	signal sig_rgb_enable	: std_logic;
-	signal sig_rgb_id		: std_logic;
-	signal sig_rgb_color	: std_logic_vector (1 downto 0);
+	signal sig_rgb_enable	: std_logic := '0';
+	signal sig_rgb_id		: std_logic := '0';
+	signal sig_rgb_color	: std_logic_vector (1 downto 0) := (others => '0');
 
 	-- 7-segment display signals
-	signal sig_seg_enable	: std_logic;
-	signal sig_seg1_state	: std_logic;
-	signal sig_seg2_state	: std_logic;
-	signal sig_seg_id		: std_logic; -- Display id, either 1 (left display) or 0 (right display)
-	signal sig_seg_value	: std_logic_vector (31 downto 0); -- Binary value for one of the displays
-
-	signal sig_prev_enable	: std_logic;
+--	signal sig_seg_enable	: std_logic;
+--	signal sig_seg1_state	: std_logic;
+--	signal sig_seg2_state	: std_logic;
+--	signal sig_seg_id		: std_logic; -- Display id, either 1 (left display) or 0 (right display)
+--	signal sig_seg_value	: std_logic_vector (31 downto 0); -- Binary value for one of the displays
 
 begin
 
-	sig_rgb_color <= sig_value(1 downto 0);
-
-	GET_CHAR : process(clock, enter, sig_parsed, sig_command)
+	GET_CHAR : process(clock)
 	begin
 		if rising_edge(clock) then
---		    if enter = '1' then
---		      sig_led_id <= "0000";
---		      sig_led_enable <= '1';
---		      sig_state <= '1';
-		      
---		    enable <= '1';
-		    
---		    if data = "01001011" then
---		      sig_led_id <= "0001";
---		      sig_led_enable <= '1';
---		      sig_state <= '1';
-	
-		    
---		    elsif isready = '1' then --L
---		      sig_led_id <= "0010";
---		      sig_led_enable <= '1';
---		      sig_state <= '1';
---		    end if; 
-
 			-- No need for reset, since it's handled in submodules
 			
 			-- Reset enter_confirm
@@ -144,28 +120,21 @@ begin
 				parsed_confirm <= '0';
 				sig_led_enable <= '0';
 				sig_rgb_enable <= '0';
-				sig_seg_enable <= '0';
+--				sig_seg_enable <= '0';
 			end if;
 
 			if sig_parsed = '1' then
 				enter_confirm <= '1';
 				parsed_confirm <= '1'; -- Set parsed confirmation
 				
-				case sig_command is
-					when "00" => sig_led_enable <= '1';
-					when "01" => sig_rgb_enable <= '1';
-					when "10" =>
-						if sig_seg_id = '0' then
-							sig_seg1_state <= sig_state;
-							sig_seg_value(15 downto 0) <= sig_value;
-						else
-							sig_seg2_state <= sig_state;
-							sig_seg_value(31 downto 16) <= sig_value;
-						end if;
-	
-						sig_seg_enable <= '1';
-					when others => sig_led_enable <= '1';
-				end case;
+				if sig_command = '0' then
+					sig_led_enable <= '1';
+					sig_led_id <= sig_id;
+				else
+					sig_rgb_enable <= '1';
+					sig_rgb_id <= sig_id(0);
+					sig_rgb_color <= sig_value;
+				end if;
 			end if;
 		end if;
 
@@ -193,34 +162,33 @@ begin
 		cled1 => cled1
 	);
 	
-	module_seven_segment_display: Executor_7_Segment_Display
-	port map (
-		clock => clock,
-		reset => reset,
-		enable => sig_seg_enable,
-		state1 => sig_seg1_state,
-		state2 => sig_seg2_state,
-		value => sig_seg_value,
-		cathode => cathode,
-		anode => anode
-	);
+--	module_seven_segment_display: Executor_7_Segment_Display
+--	port map (
+--		clock => clock,
+--		reset => reset,
+--		enable => sig_seg_enable,
+--		state1 => sig_seg1_state,
+--		state2 => sig_seg2_state,
+--		value => sig_seg_value,
+--		cathode => cathode,
+--		anode => anode
+--	);
 
 	module_parser: Executor_Parser
 	port map (
 		clock => clock,
 		reset => reset,
-		symbol => data,
-		enable => enter,
-		parsed => sig_parsed,
+		char => data,
+		start_parsing => enter,
 		parsed_confirm => parsed_confirm,
+		char_is_ready => isready,
+		parsed => sig_parsed,
 		command => sig_command,
-		led_id => sig_led_id,
-		cled_id => sig_rgb_id,
-		seg_id => sig_seg_id,
+		id => sig_id,
 		onoff => sig_state,
 		value => sig_value,
-		newchar => enable,
-		isready => isready
+		wanted_char_at => data_index,
+		want_new_char => enable
 	);
 
 end architecture;

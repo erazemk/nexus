@@ -15,7 +15,9 @@ entity Executor is
 		isready			: in std_logic;
 		led				: out std_logic_vector (15 downto 0); -- LEDs
 		cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
-		cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
+		cled1			: out std_logic_vector (2 downto 0); -- RGB LED 1
+		vga_color		: out std_logic_vector(3 downto 0);
+		vga_enable      : out std_logic
 	);
 
 end entity;
@@ -55,7 +57,7 @@ architecture Behavioral of Executor is
 			parsed_confirm	: in std_logic;
 			char_is_ready	: in std_logic;
 			parsed			: out std_logic := '0';
-			command			: out std_logic := '0';
+			command			: out std_logic_vector(1 downto 0) := (others => '0');
 			value			: out std_logic_vector(2 downto 0) := (others => '0');
 			id				: out std_logic_vector(3 downto 0) := (others => '0');
 			onoff			: out std_logic := '0';
@@ -67,7 +69,7 @@ architecture Behavioral of Executor is
 	-- Shared signals
 	signal sig_state		: std_logic := '0'; -- Whether a module is enabled or disabled (e.g. LED = ON/OFF)
 	signal sig_parsed		: std_logic := '0'; -- Enabled when parser has parsed line
-	signal sig_command		: std_logic := '0'; -- 0 = LED, 1 = RGB LED
+	signal sig_command		: std_logic_vector(1 downto 0) := (others => '0'); -- 0 = LED, 1 = RGB LED, 2 ODZADJE
 	signal sig_id			: std_logic_vector(3 downto 0) := (others => '0'); -- ID of module element (e.g. LED with ID 1)
 	signal sig_value		: std_logic_vector(2 downto 0) := (others => '0'); -- Used for RGB LEDs (e.g. CLED 1 R[ed])
 	signal parsed_confirm	: std_logic := '0';
@@ -79,6 +81,7 @@ architecture Behavioral of Executor is
 	-- RGB LED signals
 	signal sig_rgb_enable	: std_logic := '0';
 	signal sig_rgb_id		: std_logic := '0';
+	
 
 begin
 
@@ -103,12 +106,15 @@ begin
 				enter_confirm <= '1';
 				parsed_confirm <= '1'; -- Set parsed confirmation
 
-				if sig_command = '0' then -- LED command
+				if sig_command = "00" then -- LED command
 					sig_led_enable <= '1';
-					sig_led_id <= sig_id;
-				else -- CLED command
+					sig_led_id <= sig_id;				    
+				elsif sig_command = "01"then -- CLED command
 					sig_rgb_enable <= '1';
 					sig_rgb_id <= sig_id(0);
+				else 
+				    vga_color <= sig_id;
+				    vga_enable <= '1';
 				end if;
 			end if;
 		end if;

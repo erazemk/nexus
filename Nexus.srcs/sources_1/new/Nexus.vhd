@@ -42,7 +42,9 @@ architecture Behavioral of Nexus is
 			isready			: in std_logic;
 			led				: out std_logic_vector (15 downto 0); -- LEDs
 			cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
-			cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
+			cled1			: out std_logic_vector (2 downto 0); -- RGB LED 1
+			vga_color		: out std_logic_vector(3 downto 0);
+		    vga_enable      : out std_logic
 		);
 	end component;
 
@@ -56,7 +58,8 @@ architecture Behavioral of Nexus is
 			getchar	: out std_logic;
 			red		: out std_logic_vector (3 downto 0);
 			green	: out std_logic_vector (3 downto 0);
-			blue	: out std_logic_vector (3 downto 0)
+			blue	: out std_logic_vector (3 downto 0);
+			bckgrnd : in std_logic_vector (3 downto 0)
 		);
 	end component;
 
@@ -102,6 +105,7 @@ architecture Behavioral of Nexus is
 	signal SIG_VGA_COUNTER		: unsigned (8 downto 0) := "000010001";
 	signal SIG_VGA_NEWCHAR		: std_logic;
 	signal SIG_VGA_PREVCHAR		: std_logic;
+	signal SIG_VGA_BCKGRND      : std_logic_vector (3 downto 0):= (others => '0');
 
 	-- Keyboard signals
 	signal SIG_KEYBOARD_CHAR	: std_logic_vector (7 downto 0);
@@ -117,6 +121,10 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_NEWCHAR	: std_logic;
 	signal SIG_EXECUTOR_READY	: std_logic := '0';
 	signal SIG_EXECUTOR_INDEX	: std_logic_vector(8 downto 0);
+	signal SIG_VGA_COLOR        : std_logic_vector (3 downto 0);
+	signal SIG_VGA_ENABLE       : std_logic;
+
+	
 	
 	-- Allowed character array
 	type char_array_type is array (0 to 25) of std_logic_vector(7 downto 0);
@@ -235,6 +243,8 @@ begin
 
 				SIG_BUFFER_ADDR_B <= std_logic_vector(SIG_VGA_COUNTER);
 				SIG_VGA_CHAR <= SIG_BUFFER_DATA_B;
+			elsif SIG_VGA_ENABLE = '1' then
+			     SIG_VGA_BCKGRND <= SIG_VGA_COLOR;
 			end if;
 		end if;
 	end process;
@@ -251,7 +261,9 @@ begin
 		data_index => SIG_EXECUTOR_INDEX,
 		led => LED,
 		cled0 => CLED0,
-		cled1 => CLED1
+		cled1 => CLED1,
+		vga_color => SIG_VGA_COLOR,
+		vga_enable => SIG_VGA_ENABLE
 	);
 
 	module_vga: VGA
@@ -264,7 +276,8 @@ begin
 		getchar => SIG_VGA_NEWCHAR,
 		red => VGA_R,
 		green => VGA_G,
-		blue => VGA_B
+		blue => VGA_B,
+		bckgrnd => SIG_VGA_BCKGRND
 	);
 
 	module_keyboard: Keyboard

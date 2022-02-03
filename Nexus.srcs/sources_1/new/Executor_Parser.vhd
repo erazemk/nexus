@@ -11,7 +11,7 @@ entity Executor_Parser is
 		parsed_confirm	: in std_logic;
 		char_is_ready	: in std_logic;
 		parsed			: out std_logic := '0';
-		command			: out std_logic := '0';
+		command			: out std_logic_vector(1 downto 0) := (others => '0');
 		value			: out std_logic_vector(2 downto 0) := (others => '0');
 		id				: out std_logic_vector(3 downto 0) := (others => '0');
 		onoff			: out std_logic := '0';
@@ -22,7 +22,7 @@ end entity;
 
 architecture Behavioral of Executor_Parser is
 	
-	signal sig_command_parser : std_logic := '0';
+	signal sig_command_parser : std_logic_vector(1 downto 0) := (others => '0');
 	signal sig_id_parser : std_logic_vector(3 downto 0) := (others => '0');
 	signal sig_onoff_parser : std_logic := '0';
 	signal line_counter : unsigned(4 downto 0) := (others => '0');
@@ -38,14 +38,14 @@ begin
 	
 		if rising_edge(clock) then
 			if reset = '1' then
-				sig_command_parser <= '0';
+				sig_command_parser <= "00";
 				char_flag <= '0';
 				sig_id_parser <= (others => '0');
 				sig_onoff_parser <= '0';
 				line_counter <= (others => '0');
 				argument_counter <= (others => '0'); --(0 => '1', 1 => '1', others => '0');
 				parsed <= '0';
-				command <= '0';
+				command <= "00";
 				onoff <= '0';
 				wanted_char_at <= (others => '0');
 				want_new_char <= '0';
@@ -67,9 +67,10 @@ begin
 						case char is
 							--when "01001011" => sig_command_parser <= '0'; -- L
 							--when "00100001" => sig_command_parser <= '1'; -- C
-							when "00101001" => sig_command_parser <= '0'; -- Space 
-							when "00100011" => sig_command_parser <= '1'; -- D
-							when others => sig_command_parser <= '1'; -- C 
+							when "00101001" => sig_command_parser <=  "00"; -- Space 
+							when "00100011" => sig_command_parser <=  "01"; -- D
+							when "00011011" => sig_command_parser <= "10"; -- S
+							when others => sig_command_parser <=  "01"; -- C 
 						end case;
 						argument_counter <= argument_counter + 2;
 						char_flag <= '1';
@@ -102,7 +103,7 @@ begin
 							when "00110001" => -- N
 								sig_onoff_parser <= '1'; -- Turn on
 
-								if sig_command_parser = '1' then -- CLED command
+								if sig_command_parser = "01" then -- CLED command
 									sig_value_parser <= "111"; -- White
 								end if;
 							when "00101011" => sig_onoff_parser <= '0'; -- F
@@ -133,7 +134,7 @@ begin
 						id <= sig_id_parser;
 						onoff <= sig_onoff_parser;
 						value <= sig_value_parser;
-						sig_command_parser <= '0';
+						sig_command_parser <= "00";
 						sig_onoff_parser <= '0';
 						sig_id_parser <= (others => '0');
 						sig_value_parser <= (others => '0');

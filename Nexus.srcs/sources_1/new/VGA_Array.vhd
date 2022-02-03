@@ -15,7 +15,8 @@ entity VGA_Array is
 		getchar	    : out std_logic := '0';
 		red	      	: out std_logic_vector (3 downto 0) := (others => '0');
 		green     	: out std_logic_vector (3 downto 0) := (others => '0');
-		blue      	: out std_logic_vector (3 downto 0) := (others => '0')
+		blue      	: out std_logic_vector (3 downto 0) := (others => '0');
+	    RGB_bck     : in std_logic_vector (11 downto 0) := (others => '0')
     );
 end VGA_Array;
 
@@ -47,9 +48,9 @@ process(clock)
                         green <= "1111";
                         blue <= "1111";
                     else    
-                        red <= "0000";
-                        green <= "0000";
-                        blue <= "0000";
+                        red <= RGB_bck(3 downto 0);
+                        green <= RGB_bck(7 downto 4);
+                        blue <= RGB_bck(11 downto 8);
                     end if;    
                     write_column <= 0;
                 elsif write = '1' and  write_column < 128 then  

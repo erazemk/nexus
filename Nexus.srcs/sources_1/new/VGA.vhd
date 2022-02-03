@@ -13,7 +13,8 @@ entity VGA is
 		vsync	: out std_logic;
 		red		: out std_logic_vector (3 downto 0);
 		green	: out std_logic_vector (3 downto 0);
-		blue	: out std_logic_vector (3 downto 0)
+		blue	: out std_logic_vector (3 downto 0);
+		bckgrnd : in std_logic_vector (3 downto 0)
 	);
 
 end VGA;
@@ -70,7 +71,8 @@ architecture Behavioral of VGA is
 			getchar		: out std_logic;
 			red			: out std_logic_vector (3 downto 0) := (others => '0');
 			green		: out std_logic_vector (3 downto 0) := (others => '0');
-			blue		: out std_logic_vector (3 downto 0) := (others => '0')
+			blue		: out std_logic_vector (3 downto 0) := (others => '0');
+			RGB_bck     : in  std_logic_vector (11 downto 0) := (others => '0')
 		);
 	end component;
 
@@ -105,6 +107,8 @@ architecture Behavioral of VGA is
 	signal green1			: std_logic_vector (3 downto 0);
 	signal blue1			: std_logic_vector (3 downto 0);
 	signal cond				: std_logic;
+	
+	signal RGB_bck         :std_logic_vector (11 downto 0);
 begin
 
     ---------LOGIKA-----------------
@@ -122,6 +126,29 @@ begin
 	red <= red0 or red1;
 	green <= green0 or green1;
 	blue <= blue0 or blue1;
+	
+	process(bckgrnd)
+    begin 
+        case bckgrnd is
+        
+            when "0000" => RGB_bck <= "000000000000" ; -- 0
+            when "0001" => RGB_bck <= "000000000011" ; -- 1
+            when "0010" => RGB_bck <= "000000110000" ; -- 2
+            when "0011" => RGB_bck <= "001100000000"; -- 3
+            --when "0100" =>  <= ; -- 4
+            --when "0101" =>  <= ; -- 5
+            --when "0110" =>  <= ; -- 6
+            --when "0111" =>  <= ; -- 7
+            --when "1000" =>  <= ; -- 8
+            --when "01000110" =>  <= "1001"; -- 9
+            --when "00011100" =>  <= "1010"; -- A
+            --when "00110010" =>  <= "1011"; -- B
+            --when "00100001" =>  <= "1100"; -- C
+            --when "00100011" =>  <= "1101"; -- D
+            --when "00100100" =>  <= "1110"; -- E
+            when others	=> RGB_bck <= "001100110011"; -- F
+        end case;
+    end process;
     
 	module_hsync: VGA_HSync_Instance
 	port map (
@@ -169,7 +196,8 @@ begin
 		getchar => getchar0,
 		red => red0,
 		green => green0,
-		blue => blue0
+		blue => blue0,
+		RGB_bck => RGB_bck
 	);
 
 	module_array1: VGA_Array
@@ -185,7 +213,8 @@ begin
 		getchar => getchar1,
 		red => red1,
 		green => green1,
-		blue => blue1
+		blue => blue1,
+		RGB_bck => RGB_bck
 	);	
 
 end architecture;

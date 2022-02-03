@@ -2,7 +2,6 @@
 
 Nexus is an interpreter for a custom programming language, made for Xilinx's Nexys A7 FPGA.
 
-
 ## Design
 
 ![](Nexus.png)
@@ -36,6 +35,17 @@ Examples:
 CLED 1  G
 CLED 0 ON
 CLED 1 OFF 
+```
+
+### Background color
+
+Syntax: `CLRS [color]`
+- `color` is a 1-char hex value (0-9, A-F) - currently only works for values 0-3
+
+Examples:
+```
+CLRS 0
+CLRS 3
 ```
 
 ## License

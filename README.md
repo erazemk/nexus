@@ -20,10 +20,23 @@ Syntax: `LED [id] [state]`
 
 Examples:
 ```
-LED 0 ON
-LED 1 OFF
+LED  0 ON
+LED  1 OFF
 ```
 
+### RGB LEDs
+
+Syntax: `CLED [id] [state]`
+- `state` is either `ON`, `OFF` or `R` (red), `G` (green), `B` (blue)
+- if `state` is `ON`, color is set to white 
+- if `state` == `OFF`, led turns off
+
+Examples:
+```
+CLED 1  G
+CLED 0 ON
+CLED 1 OFF 
+```
 
 ## License
 

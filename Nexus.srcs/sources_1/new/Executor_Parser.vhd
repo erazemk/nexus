@@ -110,6 +110,12 @@ begin
 							when "00110010" => -- B(lue)
 								sig_value_parser <= "100";
 								sig_onoff_parser <= '1'; -- Turn on
+							when "00110101" => -- Y(ellow)
+								sig_value_parser <= "011";
+								sig_onoff_parser <= '1'; -- Turn on
+							when "01001101" => -- P(urple)
+								sig_value_parser <= "101";
+								sig_onoff_parser <= '1'; -- Turn on
 							when others => sig_error <= '1';
 						end case;
 						argument_counter <= argument_counter + 1;

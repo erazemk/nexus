@@ -119,7 +119,7 @@ architecture Behavioral of Nexus is
 	signal SIG_EXECUTOR_INDEX	: std_logic_vector(8 downto 0);
 	
 	-- Allowed character array
-	type char_array_type is array (0 to 23) of std_logic_vector(7 downto 0);
+	type char_array_type is array (0 to 25) of std_logic_vector(7 downto 0);
 	signal char_array : char_array_type := (
 			"01000101", -- 0
 			"00010110", -- 1
@@ -143,6 +143,8 @@ architecture Behavioral of Nexus is
 			"01000100", -- O
 			"00101101", -- R
 			"00011011", -- S
+			"00110101", -- Y
+			"01001101", -- P
 			"00101001", -- Space
 			"01011010"  -- Enter
 		);

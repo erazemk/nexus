@@ -19,7 +19,7 @@ end entity;
 
 architecture Behavioral of Executor_RGB_LEDs is
 	
-	signal led	: std_logic_vector (2 downto 0); -- Connects the selected LED
+	signal led	: std_logic_vector (2 downto 0) := (others => '0'); -- Connects the selected LED
 
 begin
 

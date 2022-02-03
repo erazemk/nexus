@@ -27,7 +27,7 @@ architecture Behavioral of Executor_Parser is
 	signal sig_onoff_parser : std_logic := '0';
 	signal line_counter : unsigned(4 downto 0) := (others => '0');
 	signal sig_value_parser : std_logic_vector(2 downto 0) := (others => '0');
-	signal argument_counter : unsigned(3 downto 0) := (others => '0');
+	signal argument_counter : unsigned(3 downto 0) := (others => '0'); --:= (0 => '1', 1 => '1', others => '0');
 	signal sig_error : std_logic := '0'; -- Should never be 1
 	signal char_flag : std_logic := '0';
 
@@ -43,7 +43,7 @@ begin
 				sig_id_parser <= (others => '0');
 				sig_onoff_parser <= '0';
 				line_counter <= (others => '0');
-				argument_counter <= (others => '0');
+				argument_counter <= (others => '0'); --(0 => '1', 1 => '1', others => '0');
 				parsed <= '0';
 				command <= '0';
 				onoff <= '0';
@@ -60,13 +60,18 @@ begin
 				elsif char_flag = '0' then
 					want_new_char <= '0';
 
-					if argument_counter = 0 then -- Command
+                    if argument_counter = 0 then
+                        argument_counter <= argument_counter + 3;
+                        char_flag <= '1';
+					elsif argument_counter = 3 then -- Command
 						case char is
-							when "01001011" => sig_command_parser <= '0'; -- L
-							when "00100001" => sig_command_parser <= '1'; -- C
-							when others => sig_error <= '1';
+							--when "01001011" => sig_command_parser <= '0'; -- L
+							--when "00100001" => sig_command_parser <= '1'; -- C
+							when "00101001" => sig_command_parser <= '0'; -- Space 
+							when "00100011" => sig_command_parser <= '1'; -- D
+							when others => sig_command_parser <= '1'; -- C 
 						end case;
-						argument_counter <= argument_counter + 5;
+						argument_counter <= argument_counter + 2;
 						char_flag <= '1';
 					elsif argument_counter = 5 then -- Id
 						case char is
@@ -132,7 +137,7 @@ begin
 						sig_onoff_parser <= '0';
 						sig_id_parser <= (others => '0');
 						sig_value_parser <= (others => '0');
-						argument_counter <= (others => '0');
+						argument_counter <= (others => '0'); --(0 => '1', 1 => '1', others => '0');
 					end if;
 				end if;
 			end if;		

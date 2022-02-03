@@ -21,8 +21,6 @@ architecture Behavioral of Nexus_tb is
 
 		-- Executor I/O
 		LED		: out std_logic_vector (15 downto 0);
-		AN		: out std_logic_vector (7 downto 0);
-		CA		: out std_logic_vector (7 downto 0);
 		CLED0	: out std_logic_vector (2 downto 0);
 		CLED1	: out std_logic_vector (2 downto 0);
 
@@ -39,7 +37,6 @@ architecture Behavioral of Nexus_tb is
 	signal VGA_HS, VGA_VS 		: std_logic;
     signal VGA_R, VGA_G, VGA_B  : std_logic_vector(3 downto 0);
 	signal LED  				: std_logic_vector (15 downto 0);
-	signal AN, CA 				: std_logic_vector (7 downto 0);	
 	signal CLED0, CLED1 		: std_logic_vector (2 downto 0);
 
 	-- Konstante
@@ -48,16 +45,31 @@ architecture Behavioral of Nexus_tb is
 	-- Podatke pisemo v smeri, ki je obratna, kot ce bi jih pisali glede na cas.
 	-- STOP PAR B7...... B0 START
 	--  1    0  0101 1010     0 "10 01011010 0" 
-	type char_arr_type is array (0 to 8) of std_logic_vector(10 downto 0);
+	type char_arr_type is array (0 to 9) of std_logic_vector(10 downto 0);
 	signal char_arr : char_arr_type := (
+		"00100101101", -- L
+		"00010010001", -- E
+		"00010001101", -- D
+		"00010100101", -- Space
+		"00010100101", -- Space
+		"00001011001", -- 1
+		"00010100101", -- Space
+		"00100010001", -- O
+		"00011000101", -- N
+		"00101101001"  -- Enter
+	);
+	
+	type char_arr_type2 is array (0 to 9) of std_logic_vector(10 downto 0);
+	signal char_arr2 : char_arr_type2 := (
+		"00010000101", -- C
 		"00100101101", -- L
 		"00010010001", -- E
 		"00010001101", -- D
 		"00010100101", -- Space
 		"00001011001", -- 1
 		"00010100101", -- Space
-		"00100010001", -- O
-		"00011000101", -- N
+		"00010100101", -- Space
+		"00010110101", -- R
 		"00101101001"  -- Enter
 	);
 	signal simbol : std_logic_vector(10 downto 0);
@@ -79,8 +91,6 @@ begin
 
 		-- Executor O
 		LED => LED,
-		AN => AN,
-		CA => CA,
 		CLED0 => CLED0,
 		CLED1 => CLED1
 	);
@@ -112,8 +122,8 @@ begin
 		wait for CLK_PERIOD/3;
 
 		-- LED 1 ON + Enter
-		for i in 0 to 8 loop
-		  simbol <= char_arr(i);
+		for i in 0 to 9 loop
+		  simbol <= char_arr2(i);
 		  for j in 0 to 10 loop
 			KDATA <= simbol(j);
 			wait for CLK_PERIOD * 6;

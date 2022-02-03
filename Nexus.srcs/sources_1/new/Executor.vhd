@@ -14,8 +14,6 @@ entity Executor is
 		enable			: out std_logic; -- Signals that a new character should be sent to data
 		isready			: in std_logic;
 		led				: out std_logic_vector (15 downto 0); -- LEDs
-		anode			: out std_logic_vector (7 downto 0) := (others => '1'); -- 7-seg anode
-		cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
 		cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
 		cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
 	);
@@ -35,6 +33,18 @@ architecture Behavioral of Executor is
 		);
 	end component;
 	
+	component Executor_RGB_LEDs is
+		Port (
+			clock	: in std_logic;
+			reset	: in std_logic;
+			enable	: in std_logic; -- Signals when to write to an LED
+			state	: in std_logic; -- Whether LED should be on (1) or off (0)
+			id		: in std_logic; -- ID of LED to write to
+			color	: in std_logic_vector (2 downto 0); -- Color for the LED, either 0 - Red, 1 - Green or 2 - Blue, 3 - White
+			cled0	: out std_logic_vector (2 downto 0); -- RGB LED 0
+			cled1	: out std_logic_vector (2 downto 0) -- RGB LED 1
+		);
+	end component;
 
 	component Executor_Parser is
 		Port ( 
@@ -46,6 +56,7 @@ architecture Behavioral of Executor is
 			char_is_ready	: in std_logic;
 			parsed			: out std_logic := '0';
 			command			: out std_logic := '0';
+			value			: out std_logic_vector(2 downto 0) := (others => '0');
 			id				: out std_logic_vector(3 downto 0) := (others => '0');
 			onoff			: out std_logic := '0';
 			wanted_char_at	: out std_logic_vector(8 downto 0) := (others => '0'); 
@@ -58,12 +69,16 @@ architecture Behavioral of Executor is
 	signal sig_parsed		: std_logic := '0'; -- Enabled when parser has parsed line
 	signal sig_command		: std_logic := '0'; -- 0 = LED, 1 = RGB LED
 	signal sig_id			: std_logic_vector(3 downto 0) := (others => '0'); -- ID of module element (e.g. LED with ID 1)
+	signal sig_value		: std_logic_vector(2 downto 0) := (others => '0'); -- Used for RGB LEDs (e.g. CLED 1 R[ed])
 	signal parsed_confirm	: std_logic := '0';
 	
 	-- LED signals
 	signal sig_led_enable	: std_logic := '0';
 	signal sig_led_id		: std_logic_vector (3 downto 0) := (others => '0');
 	
+	-- RGB LED signals
+	signal sig_rgb_enable	: std_logic := '0';
+	signal sig_rgb_id		: std_logic := '0';
 
 begin
 
@@ -81,13 +96,20 @@ begin
 			if sig_parsed = '0' then
 				parsed_confirm <= '0';
 				sig_led_enable <= '0';
+				sig_rgb_enable <= '0';
 			end if;
 
 			if sig_parsed = '1' then
 				enter_confirm <= '1';
 				parsed_confirm <= '1'; -- Set parsed confirmation
-				sig_led_enable <= '1';
-				sig_led_id <= sig_id;
+
+				if sig_command = '0' then -- LED command
+					sig_led_enable <= '1';
+					sig_led_id <= sig_id;
+				else -- CLED command
+					sig_rgb_enable <= '1';
+					sig_rgb_id <= sig_id(0);
+				end if;
 			end if;
 		end if;
 
@@ -103,6 +125,17 @@ begin
 		led => led
 	);
 	
+	module_rgb_led: Executor_RGB_LEDs
+	port map (
+		clock => clock,
+		reset => reset,
+		enable => sig_rgb_enable,
+		state => sig_state,
+		id => sig_rgb_id,
+		color => sig_value,
+		cled0 => cled0,
+		cled1 => cled1
+	);
 
 	module_parser: Executor_Parser
 	port map (
@@ -113,6 +146,7 @@ begin
 		parsed_confirm => parsed_confirm,
 		char_is_ready => isready,
 		parsed => sig_parsed,
+		value => sig_value,
 		command => sig_command,
 		id => sig_id,
 		onoff => sig_state,

@@ -18,8 +18,6 @@ entity Nexus is
 
 		-- Executor I/O
 		LED		: out std_logic_vector (15 downto 0) := (others => '0');
-		AN		: out std_logic_vector (7 downto 0);
-		CA		: out std_logic_vector (7 downto 0);
 		CLED0	: out std_logic_vector (2 downto 0);
 		CLED1	: out std_logic_vector (2 downto 0);
 
@@ -43,8 +41,6 @@ architecture Behavioral of Nexus is
 			enable			: out std_logic; -- Signals that a new character should be sent to data
 			isready			: in std_logic;
 			led				: out std_logic_vector (15 downto 0); -- LEDs
-			anode			: out std_logic_vector (7 downto 0); -- 7-seg anode
-			cathode			: out std_logic_vector (7 downto 0); -- 7-seg cathode
 			cled0			: out std_logic_vector (2 downto 0); -- RGB LED 0
 			cled1			: out std_logic_vector (2 downto 0) -- RGB LED 1
 		);
@@ -210,7 +206,7 @@ begin
 					end if;
 				else
 					SIG_EXECUTOR_READY <= '0';
-					SIG_EXECUTOR_COUNTER <= (others => '0'); 
+					SIG_EXECUTOR_COUNTER <= (others => '0');
 
 					if SIG_KEYBOARD_CONFIRM = '1' then
 						SIG_KEYBOARD_ENTER <= '0';
@@ -252,8 +248,6 @@ begin
 		data => SIG_EXECUTOR_CHAR,
 		data_index => SIG_EXECUTOR_INDEX,
 		led => LED,
-		anode => AN,
-		cathode => CA,
 		cled0 => CLED0,
 		cled1 => CLED1
 	);

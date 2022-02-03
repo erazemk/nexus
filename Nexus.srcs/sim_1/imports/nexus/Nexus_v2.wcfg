@@ -11,18 +11,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="5,451.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="5,926.501 ns"></ZoomEndTime>
-      <Cursor1Time time="5,720.000 ns"></Cursor1Time>
+      <ZoomStartTime time="13,160.043 ns"></ZoomStartTime>
+      <ZoomEndTime time="13,929.544 ns"></ZoomEndTime>
+      <Cursor1Time time="13,744.043 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="197"></NameColumnWidth>
-      <ValueColumnWidth column_width="79"></ValueColumnWidth>
+      <NameColumnWidth column_width="214"></NameColumnWidth>
+      <ValueColumnWidth column_width="75"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="35" />
+   <WVObjectSize size="38" />
    <wvobject fp_name="/Nexus_tb/char_arr" type="array">
-      <obj_property name="ElementShortName">char_arr[0:3][10:0]</obj_property>
-      <obj_property name="ObjectShortName">char_arr[0:3][10:0]</obj_property>
+      <obj_property name="ElementShortName">char_arr[0:9][10:0]</obj_property>
+      <obj_property name="ObjectShortName">char_arr[0:9][10:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/Nexus_tb/simbol" type="array">
       <obj_property name="ElementShortName">simbol[10:0]</obj_property>
@@ -153,11 +153,23 @@
       <obj_property name="ObjectShortName">line_counter[4:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/Nexus_tb/UUT/module_executor/module_parser/argument_counter" type="array">
-      <obj_property name="ElementShortName">argument_counter[1:0]</obj_property>
-      <obj_property name="ObjectShortName">argument_counter[1:0]</obj_property>
+      <obj_property name="ElementShortName">argument_counter[3:0]</obj_property>
+      <obj_property name="ObjectShortName">argument_counter[3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/Nexus_tb/UUT/module_executor/module_parser/sig_error" type="logic">
       <obj_property name="ElementShortName">sig_error</obj_property>
       <obj_property name="ObjectShortName">sig_error</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Nexus_tb/UUT/module_executor/module_rgb_led/color" type="array">
+      <obj_property name="ElementShortName">color[2:0]</obj_property>
+      <obj_property name="ObjectShortName">color[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Nexus_tb/UUT/module_executor/module_rgb_led/cled0" type="array">
+      <obj_property name="ElementShortName">cled0[2:0]</obj_property>
+      <obj_property name="ObjectShortName">cled0[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Nexus_tb/UUT/module_executor/module_rgb_led/cled1" type="array">
+      <obj_property name="ElementShortName">cled1[2:0]</obj_property>
+      <obj_property name="ObjectShortName">cled1[2:0]</obj_property>
    </wvobject>
 </wave_config>

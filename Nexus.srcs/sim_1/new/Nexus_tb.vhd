@@ -2,8 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 entity Nexus_tb is
-	--  Port ( );
-end Nexus_tb;
+end entity;
 
 architecture Behavioral of Nexus_tb is
     
@@ -49,15 +48,15 @@ architecture Behavioral of Nexus_tb is
 	-- Podatke pisemo v smeri, ki je obratna, kot ce bi jih pisali glede na cas.
 	-- STOP PAR B7...... B0 START
 	--  1    0  0101 1010     0 "10 01011010 0" 
-	type char_arr_type is array (0 to 3) of std_logic_vector(10 downto 0);
+	type char_arr_type is array (0 to 8) of std_logic_vector(10 downto 0);
 	signal char_arr : char_arr_type := (
 		"00100101101", -- L
---		"00010010001", -- E
---		"00010001101", -- D
---		"00010100101", -- Space
+		"00010010001", -- E
+		"00010001101", -- D
+		"00010100101", -- Space
 		"00001011001", -- 1
---		"00010100101", -- Space
---		"00100010001", -- O
+		"00010100101", -- Space
+		"00100010001", -- O
 		"00011000101", -- N
 		"00101101001"  -- Enter
 	);
@@ -112,8 +111,8 @@ begin
 		-- Zamik ure tipkovnice, da (namenoma) ne bo sinhrona z notranjo uro
 		wait for CLK_PERIOD/3;
 
-		-- LED 1 ONEnter
-		for i in 0 to 3 loop
+		-- LED 1 ON + Enter
+		for i in 0 to 8 loop
 		  simbol <= char_arr(i);
 		  for j in 0 to 10 loop
 			KDATA <= simbol(j);
@@ -122,11 +121,9 @@ begin
 			wait for CLK_PERIOD * 6;
 			KCLK <= '1';
 		  end loop;
-		  
 		end loop;
 
 		-- Mirovanje
-		--KCLK  <= '1';
 		KDATA <= '1';
 		
 		for i in 0 to 5 loop
@@ -136,37 +133,7 @@ begin
 			KCLK <= '1';
 		end loop;
 		wait;
+
 	end process;
 
---	OTH_STIMULI : process
---	begin
---		-- Reset
---		RESET   <= '0';
---		KCLK  <= '1';
---		KDATA <= '1';
---		wait for CLK_PERIOD * 3;
-
---		-- Mirovanje
---		RESET   <= '1';
---		KCLK  <= '1';
---		KDATA <= '1';
---		wait for CLK_PERIOD * 3;
-
---		-- Zamik ure tipkovnice, da (namenoma) ne bo sinhrona z notranjo uro
---		wait for CLK_PERIOD/3;
-
---		-- Pritisk tipke ENTER
---		for i in 0 to 10 loop
---			KDATA <= SIM_DATA(i);
---			wait for CLK_PERIOD * 6;
---			KCLK <= '0';
---			wait for CLK_PERIOD * 6;
---			KCLK <= '1';
---		end loop;
-
---		-- Mirovanje
---		KCLK  <= '1';
---		KDATA <= '1';
---		wait;
---	end process;
-end Behavioral;
+end architecture;

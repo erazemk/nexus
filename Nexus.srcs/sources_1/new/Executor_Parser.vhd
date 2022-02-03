@@ -25,7 +25,7 @@ architecture Behavioral of Executor_Parser is
 	signal sig_id_parser : std_logic_vector(3 downto 0) := (others => '0');
 	signal sig_onoff_parser : std_logic := '0';
 	signal line_counter : unsigned(4 downto 0) := (others => '0');
-	signal argument_counter : unsigned(1 downto 0) := (others => '0');
+	signal argument_counter : unsigned(3 downto 0) := (others => '0');
 	signal sig_error : std_logic := '0'; -- Should never be 1
 	signal char_flag : std_logic := '0';
 
@@ -64,9 +64,9 @@ begin
 							when "00100001" => sig_command_parser <= '0'; -- C
 							when others => sig_error <= '1';
 						end case;
-						argument_counter <= argument_counter + 1;
+						argument_counter <= argument_counter + 4;
 						char_flag <= '1';
-					elsif argument_counter = 1 then -- Id
+					elsif argument_counter = 4 then -- Id
 						case char is
 							when "01000101" => sig_id_parser <= "0000"; -- 0
 							when "00010110" => sig_id_parser <= "0001"; -- 1
@@ -88,9 +88,9 @@ begin
 							when "00110001" => sig_id_parser <= "1101"; -- N
 							when others => sig_id_parser <= "1111";
 						end case;
-						argument_counter <= argument_counter + 1;
+						argument_counter <= argument_counter + 3;
 						char_flag <= '1';
-					elsif argument_counter = 2 then  -- State
+					elsif argument_counter = 7 then  -- State
 						case char is
 							when "00110001" => sig_onoff_parser <= '1'; -- N
 							when "00101011" => sig_onoff_parser <= '0'; -- F

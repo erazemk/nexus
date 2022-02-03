@@ -210,6 +210,7 @@ begin
 					end if;
 				else
 					SIG_EXECUTOR_READY <= '0';
+					SIG_EXECUTOR_COUNTER <= (others => '0'); 
 
 					if SIG_KEYBOARD_CONFIRM = '1' then
 						SIG_KEYBOARD_ENTER <= '0';

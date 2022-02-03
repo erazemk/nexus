@@ -21,9 +21,9 @@ end entity;
 
 architecture Behavioral of Executor_Parser is
 	
-	signal sig_command : std_logic := '0';
-	signal sig_id : std_logic_vector(3 downto 0) := (others => '0');
-	signal sig_onoff : std_logic := '0';
+	signal sig_command_parser : std_logic := '0';
+	signal sig_id_parser : std_logic_vector(3 downto 0) := (others => '0');
+	signal sig_onoff_parser : std_logic := '0';
 	signal line_counter : unsigned(4 downto 0) := (others => '0');
 	signal argument_counter : unsigned(1 downto 0) := (others => '0');
 	signal sig_error : std_logic := '0'; -- Should never be 1
@@ -36,10 +36,10 @@ begin
 	
 		if rising_edge(clock) then
 			if reset = '1' then
-				sig_command <= '0';
+				sig_command_parser <= '0';
 				char_flag <= '0';
-				sig_id <= (others => '0');
-				sig_onoff <= '0';
+				sig_id_parser <= (others => '0');
+				sig_onoff_parser <= '0';
 				line_counter <= (others => '0');
 				argument_counter <= (others => '0');
 				parsed <= '0';
@@ -57,42 +57,43 @@ begin
 					char_flag <= '0';
 				elsif char_flag = '0' then
 					want_new_char <= '0';
+
 					if argument_counter = 0 then -- Command
 						case char is
-							when "01001011" => sig_command <= '1'; -- L
-							when "00100001" => sig_command <= '0'; -- C
+							when "01001011" => sig_command_parser <= '1'; -- L
+							when "00100001" => sig_command_parser <= '0'; -- C
 							when others => sig_error <= '1';
 						end case;
 						argument_counter <= argument_counter + 1;
 						char_flag <= '1';
 					elsif argument_counter = 1 then -- Id
 						case char is
-							when "01000101" => sig_id <= "0000"; -- 0
-							when "00010110" => sig_id <= "0001"; -- 1
-							when "00011110" => sig_id <= "0010"; -- 2
-							when "00100110" => sig_id <= "0011"; -- 3
-							when "00100101" => sig_id <= "0100"; -- 4
-							when "00101110" => sig_id <= "0101"; -- 5
-							when "00110110" => sig_id <= "0110"; -- 6
-							when "00111101" => sig_id <= "0111"; -- 7
-							when "00111110" => sig_id <= "1000"; -- 8
-							when "01000110" => sig_id <= "1001"; -- 9
-							when "00011100" => sig_id <= "1010"; -- A
-							when "00110010" => sig_id <= "1011"; -- B
-							when "00100001" => sig_id <= "1100"; -- C
-							when "00100011" => sig_id <= "1101"; -- D
-							when "00100100" => sig_id <= "1110"; -- E
-							when "00101011"	=> sig_id <= "1111"; -- F
-							when "01001011" => sig_id <= "1110"; -- L
-							when "00110001" => sig_id <= "1101"; -- N
-							when others => sig_id <= "1111";
+							when "01000101" => sig_id_parser <= "0000"; -- 0
+							when "00010110" => sig_id_parser <= "0001"; -- 1
+							when "00011110" => sig_id_parser <= "0010"; -- 2
+							when "00100110" => sig_id_parser <= "0011"; -- 3
+							when "00100101" => sig_id_parser <= "0100"; -- 4
+							when "00101110" => sig_id_parser <= "0101"; -- 5
+							when "00110110" => sig_id_parser <= "0110"; -- 6
+							when "00111101" => sig_id_parser <= "0111"; -- 7
+							when "00111110" => sig_id_parser <= "1000"; -- 8
+							when "01000110" => sig_id_parser <= "1001"; -- 9
+							when "00011100" => sig_id_parser <= "1010"; -- A
+							when "00110010" => sig_id_parser <= "1011"; -- B
+							when "00100001" => sig_id_parser <= "1100"; -- C
+							when "00100011" => sig_id_parser <= "1101"; -- D
+							when "00100100" => sig_id_parser <= "1110"; -- E
+							when "00101011"	=> sig_id_parser <= "1111"; -- F
+							when "01001011" => sig_id_parser <= "1110"; -- L
+							when "00110001" => sig_id_parser <= "1101"; -- N
+							when others => sig_id_parser <= "1111";
 						end case;
 						argument_counter <= argument_counter + 1;
 						char_flag <= '1';
 					elsif argument_counter = 2 then  -- State
 						case char is
-							when "00110001" => sig_onoff <= '1'; -- N
-							when "00101011" => sig_onoff <= '0'; -- F
+							when "00110001" => sig_onoff_parser <= '1'; -- N
+							when "00101011" => sig_onoff_parser <= '0'; -- F
 							when others => sig_error <= '1';
 						end case;
 						argument_counter <= argument_counter + 1;
@@ -101,12 +102,12 @@ begin
 						parsed <= '1';
 						char_flag <= '0';
 						line_counter <= line_counter + 1;
-						command <= sig_command;
-						id <= sig_id;
-						onoff <= sig_onoff;
-						sig_command <= '0';
-						sig_onoff <= '0';
-						sig_id <= (others => '0');
+						command <= sig_command_parser;
+						id <= sig_id_parser;
+						onoff <= sig_onoff_parser;
+						sig_command_parser <= '0';
+						sig_onoff_parser <= '0';
+						sig_id_parser <= (others => '0');
 						argument_counter <= (others => '0');
 					end if;
 				end if;

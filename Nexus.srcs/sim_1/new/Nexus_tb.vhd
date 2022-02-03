@@ -66,10 +66,10 @@ architecture Behavioral of Nexus_tb is
 		"00010010001", -- E
 		"00010001101", -- D
 		"00010100101", -- Space
-		"00001011001", -- 1
+		"00100010101", -- 0
 		"00010100101", -- Space
 		"00010100101", -- Space
-		"00010110101", -- R
+		"00100110101", -- P
 		"00101101001"  -- Enter
 	);
 	signal simbol : std_logic_vector(10 downto 0);
@@ -122,7 +122,7 @@ begin
 		wait for CLK_PERIOD/3;
 
 		-- LED 1 ON + Enter
-		for i in 0 to 9 loop
+		for i in 0 to char_arr2'length - 1 loop
 		  simbol <= char_arr2(i);
 		  for j in 0 to 10 loop
 			KDATA <= simbol(j);
